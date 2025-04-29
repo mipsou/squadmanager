@@ -1,0 +1,19 @@
+[project]
+name = "dreamteam"
+version = "0.1.0"
+description = "DreamTeam manage all crewai team"
+authors = [{ name = "Mipsou", email = "you@example.com" }]
+requires-python = ">=3.10,<3.14"
+dependencies = [
+    "crewai>=0.1.0,<1.0.0"
+]
+
+[project.scripts]
+dreamteam = "dreamteam.cli:cli"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.crewai]
+type = "crew"

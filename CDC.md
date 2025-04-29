@@ -1,0 +1,124 @@
+# Cahier des Charges (CDC) pour DreamTeam
+Documentation officielle : https://docs.crewai.com/
+Documentation sur les tests CrewAI : https://docs.crewai.com/concepts/testing
+
+## Installation
+CrewAI utilise `uv` comme outil de gestion de dépendances et de CLI.
+
+### Windows
+```powershell
+irm https://astral.sh/uv/install.ps1 | iex
+uv tool install crewai
+uv tool update-shell
+uv tool list
+```
+
+### macOS / Linux
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+uv tool install crewai
+uv tool list
+```
+
+## Projet DreamTeam
+
+*Définition en cours…*
+
+DreamTeam pilotera plusieurs équipes CrewIA, une équipe par projet.
+Chaque projet disposera d'un CDC dédié décrivant ses spécificités, objectifs et livrables.
+
+## Structure hiérarchique de CrewIA
+
+### Niveau 1 : Direction Stratégique
+- **Directeur Général (DG)** : Supervise l'ensemble des projets et assure l'alignement avec les objectifs stratégiques de l'entreprise.
+- S'appuie sur des conseillers ou directeurs adjoints pour chaque domaine.
+
+### Niveau 2 : Gestion de Projet et Coordination
+- **Superviseur de Projet** : Point de contact principal, coordonne les activités journalières.
+- **Chef de Projet** : Gère ressources, délais et budgets, et rend compte au Superviseur.
+
+### Niveau 3 : Équipes Opérationnelles
+- **Expert Codeur** : Dirige le développement technique et veille à la qualité du code.
+- **Spécialiste Technique** : Support technique et résolution des problèmes complexes.
+- **Responsable Qualité (QA)** : Conduit les tests pour garantir la qualité du produit.
+- **Documentaliste** : Gère et met à jour la documentation du projet.
+- **Autres Spécialistes** : Marketing, Analyste de Données, Designer, etc.
+
+## Processus de Création et d'Ajustement d'Équipe
+- **Évaluation Initiale** : Avant le début de chaque projet, évaluer les besoins spécifiques en termes de compétences et de ressources.
+- **Formation de l'Équipe** : Constituer l'équipe en sélectionnant les membres selon compétences et disponibilité.
+- **Ajustement Continu** : Processus d'évaluation continue pour ajuster taille et composition de l'équipe selon progrès et défis.
+
+## Processus de Traduction IA du CDC
+- **Besoin** : Le PDG soumet un CDC à traduire via IA.
+- **Formation de la Team** :
+  - **Prompt Engineer** : conçoit et affine les prompts pour l'IA.
+  - **Traducteur Bilingue** : vérifie et ajuste la traduction.
+  - **Responsable Qualité (QA)** : valide la cohérence et l'exhaustivité.
+  - **Documentaliste** : met à jour la documentation traduite.
+- **Étapes** :
+  1. Réception du CDC original et identification des sections.
+  2. Draft de prompts pour chaque section (voir template ci-dessous).
+  3. Exécution IA et validation par Traducteur.
+  4. Relecture QA et finalisation.
+- **Template de Prompt** :
+  « Veuillez traduire le texte suivant du [langue source] vers [langue cible] en conservant la terminologie technique et la mise en forme Markdown :
+  ```
+  {{ contenu_CDC }}
+  ```
+  »
+
+## Rôles et Responsabilités de DreamTeam
+1. **Définir les Projets et Objectifs**
+   - Créer des Projets : utiliser CrewAI pour définir chaque projet, ses objectifs, échéances et livrables.
+   - Établir des Priorités : classer les projets par priorité pour guider le focus des équipes.
+2. **Structurer les Équipes**
+   - Créer des Équipes : former des équipes selon compétences et disponibilité.
+   - Rôles et Responsabilités : assigner des rôles (chef de projet, développeur, QA, etc.) pour clarifier responsabilités.
+3. **Attribuer des Tâches**
+   - Utiliser l'IA pour l'Attribution : CrewAI suggère des tâches basées sur compétences et charge de travail.
+   - Tâches Claires et Délais : définir des descriptions précises et échéances pour chaque membre.
+4. **Suivi et Communication**
+   - Suivi des Progrès : suivre l'avancement en temps réel via CrewAI.
+   - Notifications et Rappels : configurer des alertes pour échéances et tâches prioritaires.
+5. **Feedback et Ajustements**
+   - Collecte de Feedback : encourager retours d'équipe, analyser avec CrewAI pour améliorer.
+   - Ajustement des Ressources : réattribuer ou ajuster ressources selon feedback et besoins.
+6. **Rapports et Analytique**
+   - Générer des Rapports : CrewAI produit des rapports sur performance, avancement et défis.
+   - Analyse des Données : identifier tendances, goulots d'étranglement et opportunités d'amélioration.
+
+## Principes d'Agent (Règles d'or)
+- Répondre toujours en français.
+- Utiliser la méthode TDD.
+- Se servir de la mémoire pour suivre le contexte.
+- Vérifier avant chaque modification.
+- Ne pas détruire les fichiers originaux.
+- Lire systématiquement le `CDC.md` avant chaque action.
+- Consigner les jalons d'avancement dans le `DEVBOOK.md` en suivant la structure définie.
+- Utiliser `.windows.conf` pour la configuration.
+- Prioriser la sécurité.
+- Respecter les bonnes pratiques.
+- Analyser l'existant avant d'agir.
+- Lire la documentation (RTFM) avant utilisation.
+
+## Flexibilité et Adaptabilité
+- **Modules Flexibles** : Équipes modulaires, permettant d'ajouter/retirer des membres rapidement selon besoins évolutifs.
+- **Communication Ouverte** : Réunions régulières et outils de communication pour alignement et information des équipes.
+
+## Utilisation CLI
+Voici la liste des sous-commandes disponibles via `dreamteam` :
+
+```bash
+dreamteam create_project <nom>                   # Créer un projet
+dreamteam create_team <nom>                     # Créer une équipe et son dossier
+dreamteam add_member_to_team <équipe> <membre>   # Ajouter un membre
+dreamteam assign_project_to_team <équipe> <projet> # Assigner un projet à une équipe
+dreamteam assign_project_to_all_teams <projet>    # Assigner un projet à toutes les équipes
+dreamteam set_cdc <projet> <chemin_fichier>        # Définir le CDC
+dreamteam get_cdc <projet>                        # Récupérer le CDC
+dreamteam transmit_cdc <projet>                   # Transmettre le CDC
+dreamteam run [--topic TOPIC] [--current_year YEAR] # Lancer la crewAI
+dreamteam train <n_iterations> <fichier> [--topic TOPIC] [--current_year YEAR] # Entraîner la crewAI
+dreamteam replay <task_id>                        # Rejouer une tâche
+dreamteam test <n_iterations> <eval_llm> [--topic TOPIC] [--current_year YEAR] # Tester la crewAI
