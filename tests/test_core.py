@@ -51,3 +51,17 @@ def test_assign_project_to_all_teams():
     team.create_team("teamB")
     assigned = team.assign_project_to_all_teams("globalproj")
     assert set(assigned) == {"teamA", "teamB"}
+
+def test_send_and_get_messages():
+    team = DreamTeam()
+    team.create_team("team1")
+    result = team.send_message("team1", "Hello")
+    assert result == "Message sent to team1"
+    assert team.get_messages("team1") == ["Hello"]
+
+def test_broadcast_message():
+    team = DreamTeam()
+    team.create_team("team1")
+    team.create_team("team2")
+    msgs = team.broadcast_message("Broadcast")
+    assert msgs == {"team1": ["Broadcast"], "team2": ["Broadcast"]}

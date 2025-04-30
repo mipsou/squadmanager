@@ -10,6 +10,8 @@ class DreamTeam:
         self.projects = {}
         self.teams = {}
         self.team_projects = {}
+        # Message storage for team communications
+        self.messages = {}
 
     def create_project(self, name: str) -> str:
         """
@@ -90,3 +92,22 @@ class DreamTeam:
             self.team_projects.setdefault(team, []).append(project)
             assigned.append(team)
         return assigned
+
+    def send_message(self, team: str, message: str) -> str:
+        """Send a message from a team to DreamTeam."""
+        if team not in self.teams:
+            raise ValueError(f"Team {team} does not exist")
+        self.messages.setdefault(team, []).append(message)
+        return f"Message sent to {team}"
+
+    def get_messages(self, team: str) -> list:
+        """Retrieve messages sent by a team."""
+        if team not in self.teams:
+            raise ValueError(f"Team {team} does not exist")
+        return self.messages.get(team, [])
+
+    def broadcast_message(self, message: str) -> dict:
+        """Broadcast a message to all teams."""
+        for tm in self.teams:
+            self.messages.setdefault(tm, []).append(message)
+        return self.messages
