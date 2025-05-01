@@ -3,8 +3,8 @@ import yaml
 from pathlib import Path
 from typing import List
 from langchain.chat_models.ollama import ChatOllama
-import warnings
-warnings.filterwarnings("ignore", category=UserWarning, message="Mixing V1 models and V2 models*")
+import warnings  # conservé si nécessaire ailleurs
+# Note : suppression des filtres de warning, ils doivent remonter pour signaler les problèmes
 
 # CrewAI core imports
 Agent = getattr(crewai, 'Agent', None)
