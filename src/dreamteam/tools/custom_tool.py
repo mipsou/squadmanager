@@ -1,10 +1,12 @@
 from crewai.tools import BaseTool
 from typing import Type
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class MyCustomToolInput(BaseModel):
     """Input schema for MyCustomTool."""
+    # Configuration V2 de Pydantic
+    model_config: ConfigDict = ConfigDict()
     argument: str = Field(..., description="Description of the argument.")
 
 class MyCustomTool(BaseTool):
