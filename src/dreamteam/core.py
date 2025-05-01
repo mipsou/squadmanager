@@ -3,7 +3,8 @@ Core module for DreamTeam
 """
 
 import os
-TEAMS_DIR = r"D:\Scripts\Teeams"
+# Directory where teams are stored (corrected folder name)
+TEAMS_DIR = r"D:\Scripts\Teams"
 
 class DreamTeam:
     def __init__(self):
@@ -12,6 +13,8 @@ class DreamTeam:
         self.team_projects = {}
         # Message storage for team communications
         self.messages = {}
+        # KPI storage for tracking metrics
+        self.kpis = {}
 
     def create_project(self, name: str) -> str:
         """
@@ -111,3 +114,35 @@ class DreamTeam:
         for tm in self.teams:
             self.messages.setdefault(tm, []).append(message)
         return self.messages
+
+    def define_kpi(self, name: str, description: str) -> None:
+        """Define a new KPI with a description."""
+        if name in self.kpis:
+            raise ValueError(f"KPI {name} already defined")
+        self.kpis[name] = {"description": description, "value": 0}
+
+    def bulk_define_kpis(self, definitions: dict) -> None:
+        """Define multiple KPIs at once."""
+        for name, desc in definitions.items():
+            self.define_kpi(name, desc)
+
+    def increment_kpi(self, name: str, amount: int = 1) -> None:
+        """Increment an existing KPI by amount."""
+        if name not in self.kpis:
+            raise ValueError(f"KPI {name} is not defined")
+        self.kpis[name]["value"] += amount
+
+    def get_kpi(self, name: str) -> int:
+        """Get the current value of a KPI."""
+        if name not in self.kpis:
+            raise ValueError(f"KPI {name} is not defined")
+        return self.kpis[name]["value"]
+
+    def get_all_kpis(self) -> dict:
+        """Return all defined KPIs with their descriptions and values."""
+        return self.kpis
+
+    def report_kpis(self) -> str:
+        """Generate a textual report of KPIs."""
+        lines = [f"{name}: {info['value']} ({info['description']})" for name, info in self.kpis.items()]
+        return "\n".join(lines)
