@@ -3,6 +3,8 @@ import yaml
 from pathlib import Path
 from typing import List
 from langchain.chat_models.ollama import ChatOllama
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, message="Mixing V1 models and V2 models*")
 
 # CrewAI core imports
 Agent = getattr(crewai, 'Agent', None)
@@ -71,7 +73,12 @@ class Dreamteam():
             else:
                 cfg.setdefault("openai_api_key", "")
         # Instanciation dynamique des agents et tâches
-        self.agents = [getattr(self, name)() for name in self.agents_config.keys()]
+        self.agents = []
+        self.agents_by_name = {}
+        for name in self.agents_config.keys():
+            agent_instance = getattr(self, name)()
+            self.agents.append(agent_instance)
+            self.agents_by_name[name] = agent_instance
         self.tasks = [getattr(self, name)() for name in self.tasks_config.keys()]
 
     # Learn more about YAML configuration files here:
@@ -123,17 +130,38 @@ class Dreamteam():
     @task
     def draft_prompt(self) -> Task:
         cfg = self.tasks_config['draft_prompt']
-        return Task(**cfg)
+        agent_name = cfg.get('agent')
+        agent = self.agents_by_name.get(agent_name)
+        return Task(
+            description=cfg['description'],
+            agent=agent,
+            tools=cfg.get('tools', []),
+            **cfg.get('parameters', {})
+        )
 
     @task
     def review_prompt(self) -> Task:
         cfg = self.tasks_config['review_prompt']
-        return Task(**cfg)
+        agent_name = cfg.get('agent')
+        agent = self.agents_by_name.get(agent_name)
+        return Task(
+            description=cfg['description'],
+            agent=agent,
+            tools=cfg.get('tools', []),
+            **cfg.get('parameters', {})
+        )
 
     @task
     def finalize_prompt(self) -> Task:
         cfg = self.tasks_config['finalize_prompt']
-        return Task(**cfg)
+        agent_name = cfg.get('agent')
+        agent = self.agents_by_name.get(agent_name)
+        return Task(
+            description=cfg['description'],
+            agent=agent,
+            tools=cfg.get('tools', []),
+            **cfg.get('parameters', {})
+        )
 
     @crew
     def crew(self) -> Crew:
@@ -141,6 +169,6 @@ class Dreamteam():
         return Crew(
             agents=self.agents,
             tasks=self.tasks,
-            process=Process.daemon,
+            process=Process.sequential,
             verbose=True
         )
