@@ -2,6 +2,7 @@ import argparse
 from dreamteam.core import DreamTeam
 from dreamteam.crew import Dreamteam as Crew
 from datetime import datetime
+import subprocess
 
 
 def cli():
@@ -58,6 +59,8 @@ def cli():
     sp.add_argument("eval_llm", help="Evaluation LLM")
     sp.add_argument("--topic", default="AI LLMs", help="Topic")
     sp.add_argument("--current_year", default=str(datetime.now().year), help="Year")
+
+    sp = subparsers.add_parser("crewai_test", help="Run crewai CLI tests")
 
     # KPI management commands
     sp = subparsers.add_parser("define_kpi", help="Define a new KPI")
@@ -117,6 +120,8 @@ def cli():
         )
         if result is not None:
             print(result)
+    elif args.command == "crewai_test":
+        subprocess.run(["crewai", "test"], check=True)
     elif args.command == "define_kpi":
         team.define_kpi(args.name, args.description)
         print(f"KPI {args.name} defined")
