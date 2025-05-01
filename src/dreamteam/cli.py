@@ -100,26 +100,13 @@ def cli():
         print(team.transmit_cdc(args.project))
     # crew commands
     elif args.command == "run":
-        crew = Crew()
-        inputs = {"topic": args.topic, "current_year": args.current_year}
-        crew.crew().kickoff(inputs=inputs)
+        subprocess.run(["crewai", "run"], check=True)
     elif args.command == "train":
-        crew = Crew()
-        inputs = {"topic": args.topic, "current_year": args.current_year}
-        crew.crew().train(n_iterations=args.n_iterations, filename=args.filename, inputs=inputs)
+        subprocess.run(["crewai", "train", str(args.n_iterations), args.filename], check=True)
     elif args.command == "replay":
-        Crew().crew().replay(task_id=args.task_id)
+        subprocess.run(["crewai", "replay", args.task_id], check=True)
     elif args.command == "test":
-        # Execute crewAI test and print result
-        crew_instance = Crew()
-        inputs = {"topic": args.topic, "current_year": args.current_year}
-        result = crew_instance.crew().test(
-            n_iterations=args.n_iterations,
-            eval_llm=args.eval_llm,
-            inputs=inputs
-        )
-        if result is not None:
-            print(result)
+        subprocess.run(["crewai", "test", str(args.n_iterations), args.eval_llm], check=True)
     elif args.command == "crewai_test":
         subprocess.run(["crewai", "test"], check=True)
     elif args.command == "define_kpi":
