@@ -59,6 +59,22 @@ def cli():
     sp.add_argument("--topic", default="AI LLMs", help="Topic")
     sp.add_argument("--current_year", default=str(datetime.now().year), help="Year")
 
+    # KPI management commands
+    sp = subparsers.add_parser("define_kpi", help="Define a new KPI")
+    sp.add_argument("name", help="KPI name")
+    sp.add_argument("description", help="KPI description")
+
+    sp = subparsers.add_parser("increment_kpi", help="Increment a KPI")
+    sp.add_argument("name", help="KPI name")
+    sp.add_argument("--amount", type=int, default=1, help="Amount to increment")
+
+    sp = subparsers.add_parser("get_kpi", help="Get a KPI value")
+    sp.add_argument("name", help="KPI name")
+
+    sp = subparsers.add_parser("list_kpis", help="List all KPIs")
+
+    # Removed crewai_test subcommand: use built-in test instead
+
     args = parser.parse_args()
     team = DreamTeam()
     if args.command == "create_project":
@@ -91,8 +107,30 @@ def cli():
     elif args.command == "replay":
         Crew().crew().replay(task_id=args.task_id)
     elif args.command == "test":
-        crew = Crew()
+        # Execute crewAI test and print result
+        crew_instance = Crew()
         inputs = {"topic": args.topic, "current_year": args.current_year}
-        crew.crew().test(n_iterations=args.n_iterations, eval_llm=args.eval_llm, inputs=inputs)
+        result = crew_instance.crew().test(
+            n_iterations=args.n_iterations,
+            eval_llm=args.eval_llm,
+            inputs=inputs
+        )
+        if result is not None:
+            print(result)
+    elif args.command == "define_kpi":
+        team.define_kpi(args.name, args.description)
+        print(f"KPI {args.name} defined")
+    elif args.command == "increment_kpi":
+        team.increment_kpi(args.name, args.amount)
+        print(team.get_kpi(args.name))
+    elif args.command == "get_kpi":
+        print(team.get_kpi(args.name))
+    elif args.command == "list_kpis":
+        kpis = team.get_all_kpis()
+        for n, info in kpis.items():
+            print(f"{n}: {info['value']} -- {info['description']}")
     else:
         parser.print_help()
+
+if __name__ == "__main__":
+    cli()
