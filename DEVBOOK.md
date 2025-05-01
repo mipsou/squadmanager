@@ -13,3 +13,4 @@
 - **2025-04-28T23:53:51+02:00** : Renommage de la section pour consigner les jalons d'avancement.
 - **2025-04-28T23:57:05+02:00** : Ajout de la section Processus de Traduction IA du CDC dans `CDC.md`.
 - **2025-04-29T00:05:00+02:00** : Création des Crews via CLI CrewAI.
+- **2025-05-01T06:00:35+02:00** : Ajout de l’audit Pydantic V1 vs V2 dans `PydanticAudit.md` et plan d’action défini.
