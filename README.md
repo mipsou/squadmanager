@@ -8,7 +8,7 @@
 
 # Dreamteam Crew
 
-**🚀 Orchestrate your AI crew with ease.**
+**Un modèle Full Scale CrewAI, pensé pour être à la fois complet et facile d’utilisation par chacun.**
 
 ---
 
