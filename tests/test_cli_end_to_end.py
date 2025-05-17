@@ -3,8 +3,10 @@ import os
 import pytest
 import sys
 import pathlib
+import subprocess  # nécessaire pour subprocess.CompletedProcess
 
 
+@pytest.mark.integration
 def test_cli_run_end_to_end(tmp_path, monkeypatch):
     """
     End-to-end test of CLI 'dreamteam run' ensuring crewai run is invoked and logs are produced.
@@ -24,7 +26,7 @@ def test_cli_run_end_to_end(tmp_path, monkeypatch):
     # Exécuter la CLI dans tmp_path avec l’argument 'run'
     orig_cwd = os.getcwd()
     os.chdir(tmp_path)
-    monkeypatch.setattr(sys, 'argv', ['dreamteam', 'run'])
+    monkeypatch.setattr(sys, 'argv', ['dreamteam', 'run', '--once'])
     try:
         from dreamteam.cli import cli
         cli()

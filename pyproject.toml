@@ -5,7 +5,16 @@ description = "DreamTeam manage all crewai team"
 authors = [{ name = "Mipsou", email = "you@example.com" }]
 requires-python = ">=3.10,<3.14"
 dependencies = [
-    "crewai>=0.1.0,<1.0.0"
+    "crewai[tools]>=0.117.1,<1.0.0",
+    "appdirs>=2.0.0,<3.0.0"
+]
+readme = "README.md"
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Operating System :: OS Independent"
 ]
 
 [project.scripts]
@@ -17,3 +26,7 @@ build-backend = "hatchling.build"
 
 [tool.crewai]
 type = "crew"
+
+[project.entry-points."dreamteam.plugins"]
+# Plugins can register under this group
+example = "dreamteam.plugins.example_plugin:ExamplePlugin"

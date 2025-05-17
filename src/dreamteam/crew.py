@@ -1,29 +1,38 @@
-import crewai
+import warnings
+warnings.filterwarnings("ignore", message="Mixing V1 models and V2 models")
+
 import yaml
 from pathlib import Path
-from typing import List
-from langchain.chat_models.ollama import ChatOllama
-import warnings  # conservé si nécessaire ailleurs
-# Note : suppression des filtres de warning, ils doivent remonter pour signaler les problèmes
 
-# CrewAI core imports
-Agent = getattr(crewai, 'Agent', None)
-Crew = getattr(crewai, 'Crew', None)
-Process = getattr(crewai, 'Process', None)
-Task = getattr(crewai, 'Task', None)
-CrewBase = getattr(crewai, 'CrewBase', lambda cls: cls)
+# Optional support for Ollama models
+try:
+    from langchain.chat_models.ollama import ChatOllama
+except ImportError:
+    ChatOllama = None
 
-# Decorator stubs
-_local_agent = getattr(crewai, 'agent', None)
-agent = _local_agent if callable(_local_agent) else (lambda fn: fn)
-_local_crew = getattr(crewai, 'crew', None)
-crew = _local_crew if callable(_local_crew) else (lambda fn: fn)
-_local_task = getattr(crewai, 'task', None)
-task = _local_task if callable(_local_task) else (lambda fn: fn)
-_local_before_kickoff = getattr(crewai, 'before_kickoff', None)
-before_kickoff = _local_before_kickoff if callable(_local_before_kickoff) else (lambda fn: fn)
+import crewai
+from crewai import Agent, Crew, Process, Task
 
-# BaseAgent import fallback
+# Lifecycle decorators
+try:
+    from crewai import before_kickoff, after_kickoff
+except ImportError:
+    def before_kickoff(fn): return fn
+    def after_kickoff(fn): return fn
+
+# CrewBase and task decorators
+try:
+    from crewai.project import CrewBase, agent, crew, task
+except ImportError:
+    CrewBase = getattr(crewai, 'CrewBase', lambda cls: cls)
+    _local_agent = getattr(crewai, 'agent', None)
+    agent = _local_agent if callable(_local_agent) else (lambda fn: fn)
+    _local_crew = getattr(crewai, 'crew', None)
+    crew = _local_crew if callable(_local_crew) else (lambda fn: fn)
+    _local_task = getattr(crewai, 'task', None)
+    task = _local_task if callable(_local_task) else (lambda fn: fn)
+
+# BaseAgent fallback
 try:
     from crewai.agents.agent_builder.base_agent import BaseAgent
 except ImportError:
@@ -57,14 +66,24 @@ class Dreamteam():
         for name in ["draft_prompt", "review_prompt", "finalize_prompt"]:
             self.tasks_config[name]["parameters"].update(params)
 
-    def __init__(self):
+    def __init__(self, config_path: str = None):
         # Chargement des configs agents et tasks
-        config_dir = Path(__file__).parent / "config"
+        if config_path:
+            config_dir = Path(config_path)
+        else:
+            config_dir = Path(__file__).parent / "config"
+        # Charger config mémoire externe
+        self.memory_config = {}
+        memory_file = config_dir / "memory.yaml"
+        if memory_file.exists():
+            self.memory_config = yaml.safe_load(memory_file.read_text())
         self.agents_config = yaml.safe_load((config_dir / "agents.yaml").read_text())
-        self.tasks_config = yaml.safe_load((config_dir / "tasks.yaml").read_text())
+        raw_tasks = yaml.safe_load((config_dir / "tasks.yaml").read_text())
+        # Transformer la liste de tâches en dictionnaire {name: config}
+        self.tasks_config = {task['name']: task for task in raw_tasks}
         # Bypass validation: définir openai_api_key ou llm selon le provider
         for cfg in self.agents_config.values():
-            if cfg.get("provider") == "ollama":
+            if cfg.get("provider") == "ollama" and ChatOllama:
                 # Utiliser ChatOllama pour les modèles Ollama
                 cfg["llm"] = ChatOllama(
                     model_name=cfg.get("model"),
@@ -79,7 +98,13 @@ class Dreamteam():
             agent_instance = getattr(self, name)()
             self.agents.append(agent_instance)
             self.agents_by_name[name] = agent_instance
-        self.tasks = [getattr(self, name)() for name in self.tasks_config.keys()]
+        # Instancier uniquement les tâches dont la méthode est définie
+        self.tasks = []
+        for name in self.tasks_config.keys():
+            if hasattr(self, name):
+                self.tasks.append(getattr(self, name)())
+            else:
+                warnings.warn(f"Méthode de tâche '{name}' non implémentée, ignorée.")
 
     # Learn more about YAML configuration files here:
     # Agents: https://docs.crewai.com/concepts/agents#yaml-configuration-recommended
@@ -121,6 +146,41 @@ class Dreamteam():
     @agent
     def directeur_general(self) -> Agent:
         cfg = self.agents_config['directeur_general']
+        return Agent(**cfg, verbose=True)
+
+    @agent
+    def architecte_ia(self) -> Agent:
+        cfg = self.agents_config['architecte_ia']
+        return Agent(**cfg, verbose=True)
+
+    @agent
+    def juriste_ia(self) -> Agent:
+        cfg = self.agents_config['juriste_ia']
+        return Agent(**cfg, verbose=True)
+
+    @agent
+    def conseil_ia(self) -> Agent:
+        cfg = self.agents_config['conseil_ia']
+        return Agent(**cfg, verbose=True)
+
+    @agent
+    def dg_ia(self) -> Agent:
+        cfg = self.agents_config['dg_ia']
+        return Agent(**cfg, verbose=True)
+
+    @agent
+    def cabinet_rh(self) -> Agent:
+        cfg = self.agents_config['cabinet_rh']
+        return Agent(**cfg, verbose=True)
+
+    @agent
+    def analyste_ia(self) -> Agent:
+        cfg = self.agents_config['analyste_ia']
+        return Agent(**cfg, verbose=True)
+
+    @agent
+    def documentaliste_ia(self) -> Agent:
+        cfg = self.agents_config['documentaliste_ia']
         return Agent(**cfg, verbose=True)
 
     # To learn more about structured task outputs,
@@ -166,9 +226,26 @@ class Dreamteam():
     @crew
     def crew(self) -> Crew:
         """Creates the Dreamteam crew"""
-        return Crew(
-            agents=self.agents,
-            tasks=self.tasks,
-            process=Process.sequential,
-            verbose=True
-        )
+        crew_kwargs = {
+            "agents": self.agents,
+            "tasks": self.tasks,
+            "process": Process.sequential,
+            "verbose": True,
+            "memory": True
+        }
+        # Injection mémoire externe si configurée
+        mc = getattr(self, "memory_config", {})
+        if mc:
+            from crewai.memory import ShortTermMemory, LongTermMemory, EntityMemory
+            from crewai.memory.storage.rag_storage import RAGStorage
+            from crewai.memory.storage.ltm_sqlite_storage import LTMSQLiteStorage
+            if mc.get("short_term_memory"):
+                st_conf = mc["short_term_memory"].get("storage", {})
+                crew_kwargs["short_term_memory"] = ShortTermMemory(storage=RAGStorage(**st_conf))
+            if mc.get("long_term_memory"):
+                lt_conf = mc["long_term_memory"].get("storage", {})
+                crew_kwargs["long_term_memory"] = LongTermMemory(storage=LTMSQLiteStorage(**lt_conf))
+            if mc.get("entity_memory"):
+                em_conf = mc["entity_memory"].get("storage", {})
+                crew_kwargs["entity_memory"] = EntityMemory(storage=RAGStorage(**em_conf))
+        return Crew(**crew_kwargs)

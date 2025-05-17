@@ -1,0 +1,23 @@
+# Configuration de la mémoire externe pour Dreamteam Crew
+
+short_term_memory:
+  storage:
+    embedder_config:
+      provider: openai
+      config:
+        model: text-embedding-3-small
+    type: short_term
+    path: memory/short_term
+
+long_term_memory:
+  storage:
+    db_path: memory/org_memory.db
+
+entity_memory:
+  storage:
+    embedder_config:
+      provider: openai
+      config:
+        model: text-embedding-3-small
+    type: entity
+    path: memory/entity

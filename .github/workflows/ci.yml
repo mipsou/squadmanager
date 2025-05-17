@@ -7,17 +7,70 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.13'
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
+          restore-keys: ${{ runner.os }}-pip-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install . pytest
+      - name: Start Ollama server
+        if: matrix.os != 'windows-latest'
+        run: |
+          docker run --name ollama -d -p 11434:11434 ollamaml/ollama-server:latest
+      - name: Wait for Ollama server (Linux/macOS)
+        if: matrix.os != 'windows-latest'
+        run: |
+          for i in $(seq 1 30); do if nc -z localhost 11434; then exit 0; fi; sleep 1; done; exit 1
+      - name: Wait for Ollama server (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          $port=11434
+          for ($i=0; $i -lt 30; $i++) {
+            try {
+              $tcp = New-Object System.Net.Sockets.TcpClient('localhost',$port)
+              $tcp.Close()
+              exit 0
+            } catch {
+              Start-Sleep -Seconds 1
+            }
+          }
+          exit 1
+      - name: Lint code with flake8
+        run: |
+          pip install flake8
+          flake8 src/dreamteam
+      - name: Check formatting with black
+        run: |
+          pip install black
+          black --check src/dreamteam
       - name: Run tests
         run: |
           pytest --maxfail=1 --disable-warnings -q
+      - name: Build package
+        run: |
+          pip install hatch
+          hatch build
+      - name: Test install package
+        run: |
+          pip install dist/*.whl
+          dreamteam --help
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/

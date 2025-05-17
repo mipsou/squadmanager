@@ -1,0 +1,71 @@
+<html>
+<head>
+    <title>Table Preview</title>
+    <style>
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid black; padding: 8px; text-align: left; }
+    </style>
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th>Étape</th>
+                <th>Acteur(s)</th>
+                <th>Déclencheur / Action</th>
+                <th>Résultat</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1. Soumission du besoin</td>
+                <td>PDG</td>
+                <td>Enregistrement du besoin (formulaire/API/DB)</td>
+                <td>Besoin enregistré</td>
+            </tr>
+            <tr>
+                <td>2. Réveil de DreamTeam</td>
+                <td>DreamTeam (@before_kickoff)</td>
+                <td>has_new_project_request() → True → get_next_request()</td>
+                <td>Paramètres projet récupérés</td>
+            </tr>
+            <tr>
+                <td>3. Clarification</td>
+                <td>DG ↔ PDG</td>
+                <td>Dialogue de précision (audience, périmètre, deadlines…)</td>
+                <td>Paramètres enrichis</td>
+            </tr>
+            <tr>
+                <td>4. Génération des livrables</td>
+                <td>Prompt Engineer, QA, Documentaliste</td>
+                <td>Exécution draft, review et finalize</td>
+                <td>Livrables de cadrage (charte, planning, budget…)</td>
+            </tr>
+            <tr>
+                <td>5. Packaging des livrables</td>
+                <td>DreamTeam</td>
+                <td>Assemblage en archive (ZIP/dossier)</td>
+                <td>Archive CDC prête à l’usage</td>
+            </tr>
+            <tr>
+                <td>6. Création de la crew dédiée</td>
+                <td>DG</td>
+                <td>Instanciation de la crew projet avec input_documents</td>
+                <td>Nouvelle crew initialisée</td>
+            </tr>
+            <tr>
+                <td>7. Exécution opérationnelle</td>
+                <td>Crew projet</td>
+                <td>Tâches opérationnelles (marketing, technique, design…)</td>
+                <td>Livrables finaux du projet</td>
+            </tr>
+            <tr>
+                <td>8. Retour en veille (daemon)</td>
+                <td>DreamTeam (@after_kickoff)</td>
+                <td>Fin de cycle → remise en veille</td>
+                <td>DreamTeam prête pour un nouveau projet</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

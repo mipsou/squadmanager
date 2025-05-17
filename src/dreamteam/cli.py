@@ -1,13 +1,26 @@
 import argparse
-from dreamteam.core import DreamTeam
-from dreamteam.crew import Dreamteam as Crew
-from datetime import datetime
+import os
 import subprocess
-from pathlib import Path  # Pour gérer le chemin des logs
+import sys
+from datetime import datetime
+from dreamteam.core import DreamTeam
+from dreamteam.flow import DreamteamFlow, DreamteamState
+import json
+import sqlite3
+from dreamteam.memory import MemoryManager
+from dreamteam.memory_policy import MemoryPolicy
+from importlib.metadata import version as _version, PackageNotFoundError
+import requests
+import webbrowser
 
+try:
+    __version__ = _version('dreamteam')
+except PackageNotFoundError:
+    __version__ = '0.0.0'
 
 def cli():
     parser = argparse.ArgumentParser(prog="dreamteam")
+    parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     sp = subparsers.add_parser("create_project", help="Create a new project")
@@ -45,6 +58,7 @@ def cli():
     sp = subparsers.add_parser("run", help="Kickoff the crew")
     sp.add_argument("--topic", default="AI LLMs", help="Topic")
     sp.add_argument("--current_year", default=str(datetime.now().year), help="Year")
+    sp.add_argument("--once", action="store_true", help="Lancer une seule itération puis quitter")
 
     sp = subparsers.add_parser("train", help="Train the crew")
     sp.add_argument("n_iterations", type=int, help="Number of iterations")
@@ -55,13 +69,49 @@ def cli():
     sp = subparsers.add_parser("replay", help="Replay the crew")
     sp.add_argument("task_id", help="Task ID")
 
-    sp = subparsers.add_parser("test", help="Test the crew")
-    sp.add_argument("n_iterations", type=int, help="Number of iterations")
-    sp.add_argument("eval_llm", help="Evaluation LLM")
-    sp.add_argument("--topic", default="AI LLMs", help="Topic")
-    sp.add_argument("--current_year", default=str(datetime.now().year), help="Year")
+    sp = subparsers.add_parser("reset-memories", help="Reset CrewAI memory")
+    sp.add_argument("--force", action="store_true", help="Confirmer la suppression sans invite")
 
-    sp = subparsers.add_parser("crewai_test", help="Run crewai CLI tests")
+    # Memory CLI commands
+    sp = subparsers.add_parser("memory-show", help="Afficher l'historique de la mémoire")
+    sp = subparsers.add_parser("memory-stats", help="Afficher les statistiques de la mémoire")
+    sp = subparsers.add_parser("memory-apply-policy", help="Appliquer la politique mémoire (TTL, max_events)")
+    sp.add_argument("--ttl-days", type=int, help="TTL en jours")
+    sp.add_argument("--max-events", type=int, help="Nombre max d'événements à conserver")
+
+    # CrewAI Studio commands
+    sp = subparsers.add_parser("studio", help="Gestion de CrewAI Studio")
+    sp.add_argument("--status", action="store_true", help="Vérifier la connexion à CrewAI Studio")
+    sp.add_argument("--open", action="store_true", help="Ouvrir CrewAI Studio dans le navigateur")
+
+    # Flow Dreamteam via CrewAI Flows
+    sp = subparsers.add_parser(
+        "flow",
+        help="Lancer le flow Dreamteam via CrewAI Flows"
+    )
+    sp.add_argument(
+        "--topic",
+        default="AI LLMs",
+        help="Sujet de la tâche initiale"
+    )
+    sp.add_argument(
+        "--year",
+        type=int,
+        default=datetime.now().year,
+        help="Année courante"
+    )
+
+    # Test CrewAI CLI
+    sp = subparsers.add_parser(
+        "test",
+        aliases=["crewai_test"],
+        help="Lancer les tests intégrés de CrewAI après vérification des prérequis pytest"
+    )
+    sp.add_argument(
+        "--debug",
+        action="store_true",
+        help="Activer mode debug pour la vérification de prérequis pytest"
+    )
 
     # KPI management commands
     sp = subparsers.add_parser("define_kpi", help="Define a new KPI")
@@ -76,8 +126,6 @@ def cli():
     sp.add_argument("name", help="KPI name")
 
     sp = subparsers.add_parser("list_kpis", help="List all KPIs")
-
-    # Removed crewai_test subcommand: use built-in test instead
 
     args = parser.parse_args()
     team = DreamTeam()
@@ -101,22 +149,93 @@ def cli():
         print(team.transmit_cdc(args.project))
     # crew commands
     elif args.command == "run":
-        # Redirection des logs Ollama vers un fichier
-        log_path = Path.cwd() / "ollama.log"
-        with open(log_path, "w") as log_file:
-            subprocess.run(["crewai", "run"], check=True, stdout=log_file, stderr=subprocess.STDOUT)
-        # Affichage de la localisation et taille du fichier de log
-        size = log_path.stat().st_size
-        print(f"Logs Ollama enregistrés dans {log_path} ({size} octet{'s' if size>1 else ''})")
+        # CLI wrapper : lancer crewai run
+        try:
+            subprocess.run(["crewai", "run"], check=True)
+        except subprocess.CalledProcessError as e:
+            sys.exit(e.returncode)
+        return
     elif args.command == "train":
         subprocess.run(["crewai", "train", str(args.n_iterations), args.filename], check=True)
     elif args.command == "replay":
         subprocess.run(["crewai", "replay", args.task_id], check=True)
-    elif args.command == "test":
-        subprocess.run(["crewai", "test", str(args.n_iterations), args.eval_llm], check=True)
-    elif args.command == "crewai_test":
-        # Comportement officiel : lancer les tests CrewAI sans arguments additionnels
-        subprocess.run(["crewai", "test"], check=True)
+    elif args.command == "reset-memories":
+        if not args.force:
+            answer = input("Attention : toutes les mémoires vont être supprimées. Confirmez (o/N) : ")
+            if answer.lower() not in ("o","oui","y","yes"):
+                print("Abandon de la réinitialisation des mémoires.")
+                sys.exit(0)
+        try:
+            subprocess.run(["crewai", "reset-memories"], check=True)
+        except subprocess.CalledProcessError as e:
+            sys.exit(e.returncode)
+        return
+    elif args.command == "memory-show":
+        mgr = MemoryManager()
+        for event in mgr.load_history():
+            print(json.dumps(event, ensure_ascii=False))
+        return
+    elif args.command == "memory-stats":
+        mgr = MemoryManager()
+        history = mgr.load_history()
+        print(f"Événements historiques: {len(history)}")
+        conn = sqlite3.connect(mgr.db_path)
+        cur = conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        tables = [r[0] for r in cur.fetchall()]
+        if tables:
+            print("Tables SQLite:")
+            for t in tables:
+                count = conn.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0]
+                print(f"  - {t}: {count}")
+        else:
+            print("Aucune table SQLite trouvée")
+        conn.close()
+        return
+    elif args.command == "memory-apply-policy":
+        # Applique la politique sur history.jsonl
+        # Permet d'utiliser CREWAI_STORAGE_DIR pour tests/env
+        mgr = MemoryManager()
+        policy = MemoryPolicy(ttl_days=args.ttl_days, max_events=args.max_events)
+        kept = policy.apply(mgr)
+        print(f"Événements conservés suite à la politique: {len(kept)}")
+        return
+    elif args.command == "studio":
+        # Status or open CrewAI Studio
+        url = os.getenv("CREWAI_STUDIO_URL", "https://studio.crewai.com")
+        headers = {}
+        token = os.getenv("CREWAI_STUDIO_API_KEY")
+        if token:
+            headers["Authorization"] = f"Bearer {token}"
+        if args.status:
+            resp = requests.get(f"{url}/api/status", headers=headers)
+            print(json.dumps(resp.json(), ensure_ascii=False))
+            sys.exit(0)
+        if args.open:
+            webbrowser.open(url)
+            sys.exit(0)
+        parser.print_help()
+        sys.exit(1)
+    elif args.command == "flow":
+        # Exécuter le flow Dreamteam
+        state = DreamteamState(topic=args.topic, year=args.year)
+        try:
+            DreamteamFlow().run_flow(state)
+        except Exception:
+            sys.exit(1)
+        return
+    elif args.command in ("test", "crewai_test"):
+        # Exécuter pytest et crewai test si alias
+        pytest_cmd = ["pytest", "-vv", "-s"] if args.debug else ["pytest", "-v", "--maxfail=1", "-s"]
+        try:
+            subprocess.run(pytest_cmd, check=True)
+        except subprocess.CalledProcessError as e:
+            sys.exit(e.returncode)
+        if args.command == "crewai_test":
+            try:
+                subprocess.run(["crewai", "test"], check=True)
+            except subprocess.CalledProcessError as e:
+                sys.exit(e.returncode)
+        return
     elif args.command == "define_kpi":
         team.define_kpi(args.name, args.description)
         print(f"KPI {args.name} defined")

@@ -1,17 +1,41 @@
-research_task:
-  description: >
-    Conduct a thorough research about {topic}
-    Make sure you find any interesting and relevant information given
-    the current year is {current_year}.
-  expected_output: >
-    A list with 10 bullet points of the most relevant information about {topic}
-  agent: researcher
 
-reporting_task:
+- name: generate_subteams
+  agent: dg_ia
+  description: Générer subteams selon pdg_input.yaml
+
+- name: structure_project
+  agent: architecte_ia
+  description: Créer arborescence et fichiers YAML
+
+- name: validate_compliance
+  agent: juriste_ia
+  description: Valider conformité des configs
+
+- name: monitor_performance
+  agent: analyste_ia
+  description: Suivre indicateurs des subteams
+
+- name: archive_event
+  agent: documentaliste_ia
+  description: Enregistrer événements dans history.jsonl et org_memory.db
+
+- name: strategic_review
+  agent: conseil_ia
+  description: Évaluer actions du DG et proposer améliorations
+
+- name: report_to_central_memory
+  agent: documentaliste_ia
   description: >
-    Review the context you got and expand each topic into a full section for a report.
-    Make sure the report is detailed and contains any and all relevant information.
+    Transmets au `documentaliste_ia` un résumé d'activité de cette subteam, incluant les tâches réalisées, les résultats obtenus, les obstacles rencontrés et toute recommandation.
   expected_output: >
-    A fully fledged report with the main topics, each with a full section of information.
-    Formatted as markdown without '```'
-  agent: reporting_analyst
+    Un objet JSON contenant :
+    - Nom de la subteam
+    - Liste des tâches exécutées
+    - Tâches réussies / échouées
+    - Feedback de l’équipe
+    - Recommandations éventuelles
+
+- name: receive_team_report
+  agent: documentaliste_ia
+  description: >
+    Reçoit le rapport centralisé des subteams et l'archive via memory_logger.py

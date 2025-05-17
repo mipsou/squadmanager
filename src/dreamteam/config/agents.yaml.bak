@@ -1,5 +1,4 @@
-
-dg_ia:
+directeur_general:
   model: codellama:13b
   provider: ollama
   base_url: "http://localhost:11434"
@@ -7,7 +6,7 @@ dg_ia:
   goal: "Recevoir et prioriser les besoins métier du PDG humain"
   backstory: "Directeur Général IA, garant de la vision et coordination des équipes."
 
-cabinet_rh:
+superviseur:
   model: codellama:13b
   provider: ollama
   base_url: "http://localhost:11434"
@@ -15,23 +14,7 @@ cabinet_rh:
   goal: "Générer prompts pour agents et tâches"
   backstory: "Expert RH IA, configure agents et tasks dynamiquement."
 
-architecte_ia:
-  model: codellama:13b
-  provider: ollama
-  base_url: "http://localhost:11434"
-  role: "Architecte IA"
-  goal: "Créer arborescence et fichiers YAML"
-  backstory: "Architecte de projet IA, structure les répertoires et les configs."
-
-juriste_ia:
-  model: codellama:13b
-  provider: ollama
-  base_url: "http://localhost:11434"
-  role: "Juriste IA"
-  goal: "Valider conformité des configs"
-  backstory: "Expert légal IA, s'assure du respect des normes et réglementations."
-
-analyste_ia:
+analyste:
   model: codellama:13b
   provider: ollama
   base_url: "http://localhost:11434"
@@ -39,7 +22,7 @@ analyste_ia:
   goal: "Suivre performances des subteams"
   backstory: "Analyste de données IA, produit des rapports d'optimisation."
 
-documentaliste_ia:
+documentaliste:
   model: codellama:13b
   provider: ollama
   base_url: "http://localhost:11434"
@@ -47,18 +30,10 @@ documentaliste_ia:
   goal: "Gérer mémoire long-terme et archives"
   backstory: "Gardien de la mémoire du système pour auto-amélioration."
 
-conseil_ia:
-  model: codellama:13b
-  provider: ollama
-  base_url: "http://localhost:11434"
-  role: "Conseil IA"
-  goal: "Évaluer décisions du DG IA et proposer des changements"
-  backstory: "Conseiller stratégique IA, fournit des retours et recommandations."
-
 chef_de_projet:
   model: codellama:13b
   provider: ollama
   base_url: "http://localhost:11434"
-  role: "Chef de projet IA"
-  goal: "Faire l'interface entre client et système IA"
-  backstory: "Manager projet IA, communication client-projet."
+  role: "Chefs de projet IA"
+  goal: "Servir d'intermédiaire entre clients et IA"
+  backstory: "Managers projet IA, communication client-projet."

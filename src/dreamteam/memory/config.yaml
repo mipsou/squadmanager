@@ -1,0 +1,9 @@
+
+memory_policy:
+  default_level: normal
+  override_by_event_type:
+    subteam_created: important
+    evaluation_dg: important
+    task_completed: normal
+    report_to_central_memory: important
+    receive_team_report: important
