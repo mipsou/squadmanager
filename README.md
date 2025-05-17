@@ -1,30 +1,28 @@
-<p align="center">
 [![CI](https://img.shields.io/github/actions/workflow/status/mipsou/dreamteam/ci.yml?branch=main&style=flat-square&color=blue)](https://github.com/mipsou/dreamteam/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/mipsou/dreamteam?style=flat-square&color=brightgreen)](https://github.com/mipsou/dreamteam/releases)
 [![PyPI version](https://img.shields.io/pypi/v/dreamteam?style=flat-square&color=orange)](https://pypi.org/project/dreamteam/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue?style=flat-square)](https://opensource.org/licenses/Apache-2.0)
 [![Docs](https://img.shields.io/badge/docs-crewAI-blue?style=flat-square)](https://docs.crewai.com)
-</p>
 
-# Dreamteam Crew
+ 
+
+# Dreamteam Crew — Orchestration Multi-Agent IA
 
 **Un modèle Full Scale CrewAI, pensé pour être à la fois complet et facile d’utilisation par chacun.**
 
----
+ 
 
-<details>
-<summary>📑 Table of Contents</summary>
+Dreamteam Crew est un framework open-source Python permettant d’orchestrer un système multi-agents IA complet.  
+Basé sur CrewAI, il propose l’intégration native de la gestion de la mémoire, des workflows collaboratifs et un écosystème de plugins modulaires.  
+Parfait pour déployer rapidement des applications IA évolutives et performantes.
 
-- 🚀 [Installation](#installation)
-- ⚙️ [Usage](#usage)
-- 📖 [Memory System Concepts](#memory-system-concepts)
-- 🖥️ [CrewAI Studio Integration](#crewai-studio-integration)
-- 🔌 [Plugins](#plugins)
-- 🧪 [Testing](#testing)
-- 💖 [Contributing](#contributing)
-- 📄 [License](#license)
-
-</details>
+> **:gb: English**
+>
+> Full Scale CrewAI model: a new-generation framework that is comprehensive, powerful, and easy to use for everyone.
+>
+> Dreamteam Crew is an open-source Python framework for orchestrating a complete multi-agent AI system.
+> Built on CrewAI, it provides native memory management, collaborative workflows, and a modular plugin ecosystem.
+> Perfect for quickly deploying scalable, high-performance AI applications.
 
 ---
 
@@ -262,3 +260,9 @@ Let's create wonders together with the power and simplicity of crewAI.
 
 ## Contact
 Pour toute question, voir [mon profil GitHub](https://github.com/mipsou).
+
+**:fr: Français**
+
+Dreamteam Crew est un framework open-source Python permettant d’orchestrer un système multi-agents IA complet.  
+Basé sur CrewAI, il propose l’intégration native de la gestion de la mémoire, des workflows collaboratifs et un écosystème de plugins modulaires.  
+Parfait pour déployer rapidement des applications IA évolutives et performantes.
