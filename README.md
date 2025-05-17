@@ -6,27 +6,33 @@
 
  
 
-# Dreamteam Crew — Orchestration Multi-Agent IA
+# Dreamteam Crew — Multi-Agent AI Orchestration
 
-**Un modèle Full Scale CrewAI, pensé pour être à la fois complet et facile d’utilisation par chacun.**
+## 🇫🇷 Français
+Un modèle Full Scale CrewAI, pensé pour être à la fois complet et facile d’utilisation par chacun.
 
- 
-
-Dreamteam Crew est un framework open-source Python permettant d’orchestrer un système multi-agents IA complet.  
-Basé sur CrewAI, il propose l’intégration native de la gestion de la mémoire, des workflows collaboratifs et un écosystème de plugins modulaires.  
+Dreamteam Crew est un framework open-source Python permettant d’orchestrer un système multi-agents IA complet.
+Basé sur CrewAI, il propose l’intégration native de la gestion de la mémoire, des workflows collaboratifs et un écosystème de plugins modulaires.
 Parfait pour déployer rapidement des applications IA évolutives et performantes.
 
-> **:gb: English**
->
-> Full Scale CrewAI model: a new-generation framework that is comprehensive, powerful, and easy to use for everyone.
->
-> Dreamteam Crew is an open-source Python framework for orchestrating a complete multi-agent AI system.
-> Built on CrewAI, it provides native memory management, collaborative workflows, and a modular plugin ecosystem.
-> Perfect for quickly deploying scalable, high-performance AI applications.
+## 🇬🇧 English
+Full Scale CrewAI model: a new-generation framework that is comprehensive, powerful, and easy to use for everyone.
 
----
+Dreamteam Crew is an open-source Python framework for orchestrating a complete multi-agent AI system.
+Built on CrewAI, it provides native memory management, collaborative workflows, and a modular plugin ecosystem.
+Perfect for quickly deploying scalable, high-performance AI applications.
 
-Welcome to the Dreamteam Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
+## Table of Contents
+
+- 🚀 [Installation](#installation)
+- ⚙️ [Usage](#usage)
+- 📖 [Memory System Concepts](#memory-system-concepts)
+- 🖥️ [CrewAI Studio Integration](#installation-crewai-studio)
+- 🔌 [Plugins](#plugins)
+- 🧪 [Testing](#testing)
+- 💖 [Contributing](#contributing)
+- 📄 [License](#license)
+- 📞 [Contact](#contact)
 
 ## Installation
 
@@ -44,6 +50,7 @@ Next, navigate to your project directory and install the dependencies:
 ```bash
 crewai install
 ```
+
 ### Customizing
 
 **Add your `OPENAI_API_KEY` into the `.env` file**
@@ -260,9 +267,3 @@ Let's create wonders together with the power and simplicity of crewAI.
 
 ## Contact
 Pour toute question, voir [mon profil GitHub](https://github.com/mipsou).
-
-**:fr: Français**
-
-Dreamteam Crew est un framework open-source Python permettant d’orchestrer un système multi-agents IA complet.  
-Basé sur CrewAI, il propose l’intégration native de la gestion de la mémoire, des workflows collaboratifs et un écosystème de plugins modulaires.  
-Parfait pour déployer rapidement des applications IA évolutives et performantes.
