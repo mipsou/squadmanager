@@ -6,7 +6,9 @@ authors = [{ name = "Mipsou", email = "you@example.com" }]
 requires-python = ">=3.10,<3.14"
 dependencies = [
     "crewai[tools]>=0.117.1,<1.0.0",
-    "appdirs>=2.0.0,<3.0.0"
+    "appdirs>=2.0.0,<3.0.0",
+    "sentry-sdk>=1.9.0,<2.0.0",
+    "requests>=2.28.0,<3.0.0"
 ]
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -30,3 +32,5 @@ type = "crew"
 [project.entry-points."dreamteam.plugins"]
 # Plugins can register under this group
 example = "dreamteam.plugins.example_plugin:ExamplePlugin"
+sentry = "dreamteam.plugins.sentry_plugin:SentryPlugin"
+studio = "dreamteam.plugins.studio_plugin:StudioPlugin"

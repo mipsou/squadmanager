@@ -48,4 +48,4 @@ def test_run_flow_memory(monkeypatch):
     assert mem_mgr.actions[3][1] == 'flow_runs'
     # Validate crew kickoff inputs
     crew_instance = crew_flow._last_crew
-    assert crew_instance.inputs_called == [state.dict()]
+    assert crew_instance.inputs_called == [state.model_dump()]

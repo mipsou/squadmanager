@@ -1,6 +1,7 @@
 [![CI](https://github.com/mipsou/dreamteam/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mipsou/dreamteam/actions/workflows/ci.yml)
 [![Release](https://github.com/mipsou/dreamteam/actions/workflows/release.yml/badge.svg)](https://github.com/mipsou/dreamteam/actions/workflows/release.yml)
 [![PyPI version](https://img.shields.io/pypi/v/dreamteam.svg)](https://pypi.org/project/dreamteam/)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 # Dreamteam Crew
 
 Welcome to the Dreamteam Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
@@ -235,3 +236,6 @@ For support, questions, or feedback regarding the Dreamteam Crew or crewAI.
 - [Chat GPT dédié CrewAI](https://chat.g.pt/DWjSBZn)
 
 Let's create wonders together with the power and simplicity of crewAI.
+
+## Contact
+Pour toute question, voir [mon profil GitHub](https://github.com/mipsou).

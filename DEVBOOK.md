@@ -1,6 +1,11 @@
 # DEVBOOK.md
 
+[![CI](https://github.com/mipsou/dreamteam/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mipsou/dreamteam/actions/workflows/ci.yml)
+[![Release](https://github.com/mipsou/dreamteam/actions/workflows/release.yml/badge.svg)](https://github.com/mipsou/dreamteam/actions/workflows/release.yml)
+[![PyPI version](https://img.shields.io/pypi/v/dreamteam.svg)](https://pypi.org/project/dreamteam/)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 *Licensed under Apache License 2.0*
+*Pousser sur Git sert de sauvegarde (backup sur le dépôt)*
 
 ## Jalons d'Avancement
 *Ce document consigne les jalons d'avancement du projet.*
@@ -36,10 +41,11 @@
 - [x] Configuration CI/CD et packaging
 - [x] Release & maintenance
 - [x] Example plugin Dev Kit (exemple, documentation, plugin manager)
+- [x] Créer plugin Sentry
+- [x] Créer plugin Studio
+- [x] Implémentation des commandes CLI plugin (list, health, send)
+- [ ] Créer plugin Prometheus (non applicable, pas d'infra)
 - [ ] Intégrer Sentry pour logs/erreurs
 - [ ] Mettre en place métriques Prometheus/Grafana
 - [ ] Rédiger tests de charge basiques
 - [ ] Définir alertes CI (coverage, performances)
-- [ ] Créer plugin Sentry
-- [ ] Créer plugin Studio
-- [ ] Créer plugin Prometheus

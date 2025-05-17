@@ -9,6 +9,7 @@ import json
 import sqlite3
 from dreamteam.memory import MemoryManager
 from dreamteam.memory_policy import MemoryPolicy
+from dreamteam.plugin_manager import PluginManager
 from importlib.metadata import version as _version, PackageNotFoundError
 import requests
 import webbrowser
@@ -83,6 +84,16 @@ def cli():
     sp = subparsers.add_parser("studio", help="Gestion de CrewAI Studio")
     sp.add_argument("--status", action="store_true", help="Vérifier la connexion à CrewAI Studio")
     sp.add_argument("--open", action="store_true", help="Ouvrir CrewAI Studio dans le navigateur")
+
+    # Plugin commands
+    sp = subparsers.add_parser("plugin", help="Gestion des plugins")
+    plugin_sp = sp.add_subparsers(dest="plugin_cmd", required=True)
+    plugin_sp.add_parser("list", help="Liste des plugins")
+    hp = plugin_sp.add_parser("health", help="Status d'un plugin")
+    hp.add_argument("--plugin", required=True, help="Nom du plugin")
+    sd = plugin_sp.add_parser("send", help="Envoyer un événement à un plugin")
+    sd.add_argument("--plugin", required=True, help="Nom du plugin")
+    sd.add_argument("--payload", required=True, help="Payload JSON de l'événement")
 
     # Flow Dreamteam via CrewAI Flows
     sp = subparsers.add_parser(
@@ -215,6 +226,21 @@ def cli():
             sys.exit(0)
         parser.print_help()
         sys.exit(1)
+    elif args.command == "plugin":
+        pm = PluginManager()
+        if args.plugin_cmd == "list":
+            for name in pm.list_plugins():
+                print(name)
+            return
+        if args.plugin_cmd == "health":
+            plugin = pm.get_plugin(args.plugin)
+            print(json.dumps(plugin.health_check(), ensure_ascii=False))
+            return
+        if args.command and args.plugin_cmd == "send":
+            plugin = pm.get_plugin(args.plugin)
+            payload = json.loads(args.payload)
+            plugin.send_event(payload)
+            return
     elif args.command == "flow":
         # Exécuter le flow Dreamteam
         state = DreamteamState(topic=args.topic, year=args.year)
