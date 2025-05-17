@@ -1,9 +1,9 @@
 <p align="center">
-<img src="https://img.shields.io/github/actions/workflow/status/mipsou/dreamteam/ci.yml?branch=main&style=flat-square&color=blue" alt="CI" />
-<img src="https://img.shields.io/github/v/release/mipsou/dreamteam?style=flat-square&color=brightgreen" alt="Release" />
-<img src="https://img.shields.io/pypi/v/dreamteam?style=flat-square&color=orange" alt="PyPI version" />
-<img src="https://img.shields.io/badge/License-Apache%202.0-blue?style=flat-square" alt="License" />
-<img src="https://img.shields.io/badge/docs-crewAI-blue?style=flat-square" alt="Docs" />
+[![CI](https://img.shields.io/github/actions/workflow/status/mipsou/dreamteam/ci.yml?branch=main&style=flat-square&color=blue)](https://github.com/mipsou/dreamteam/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/mipsou/dreamteam?style=flat-square&color=brightgreen)](https://github.com/mipsou/dreamteam/releases)
+[![PyPI version](https://img.shields.io/pypi/v/dreamteam?style=flat-square&color=orange)](https://pypi.org/project/dreamteam/)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue?style=flat-square)](https://opensource.org/licenses/Apache-2.0)
+[![Docs](https://img.shields.io/badge/docs-crewAI-blue?style=flat-square)](https://docs.crewai.com)
 </p>
 
 # Dreamteam Crew
@@ -12,7 +12,8 @@
 
 ---
 
-## Table of Contents
+<details>
+<summary>📑 Table of Contents</summary>
 
 - 🚀 [Installation](#installation)
 - ⚙️ [Usage](#usage)
@@ -22,6 +23,8 @@
 - 🧪 [Testing](#testing)
 - 💖 [Contributing](#contributing)
 - 📄 [License](#license)
+
+</details>
 
 ---
 
