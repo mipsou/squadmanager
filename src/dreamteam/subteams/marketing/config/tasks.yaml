@@ -1,0 +1,8 @@
+
+- name: write_article
+  agent: Redacteur_IA
+  description: Rédiger un article IA hebdomadaire
+
+- name: post_linkedin
+  agent: Redacteur_IA
+  description: Publier l'article sur LinkedIn et analyser engagement

@@ -3,7 +3,7 @@
 ## 1. Usage dans le projet DreamTeam
 
 - **src/dreamteam/crew.py** : utilise `BaseModel` (via CrewAI Core), `@field_validator`, `@model_validator` (Pydantic V1).
-- **src/dreamteam/tools/custom_tool.py** : `from pydantic import BaseModel, Field` (V1 patterns).
+- **src/dreamteam/tools/custom_tool.py** : initialement V1, migré vers V2 en ajoutant `model_config: ConfigDict`, usage de V2 validators.
 
 ## 2. Usage dans les dépendances CrewAI
 

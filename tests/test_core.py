@@ -65,3 +65,48 @@ def test_broadcast_message():
     team.create_team("team2")
     msgs = team.broadcast_message("Broadcast")
     assert msgs == {"team1": ["Broadcast"], "team2": ["Broadcast"]}
+
+def test_define_and_get_kpi():
+    team = DreamTeam()
+    team.define_kpi("projects_created", "Number of projects created")
+    # KPI should start at 0
+    assert team.get_kpi("projects_created") == 0
+    team.increment_kpi("projects_created")
+    assert team.get_kpi("projects_created") == 1
+    # Defining an existing KPI raises
+    with pytest.raises(ValueError):
+        team.define_kpi("projects_created", "Duplicate KPI")
+
+def test_increment_undefined_kpi():
+    team = DreamTeam()
+    with pytest.raises(ValueError):
+        team.increment_kpi("undefined_kpi")
+
+def test_get_all_kpis():
+    team = DreamTeam()
+    team.define_kpi("tasks_completed", "Tasks completed")
+    team.increment_kpi("tasks_completed", 3)
+    kpis = team.get_all_kpis()
+    assert "tasks_completed" in kpis
+    assert kpis["tasks_completed"]["value"] == 3
+    assert kpis["tasks_completed"]["description"] == "Tasks completed"
+
+def test_bulk_define_kpis():
+    team = DreamTeam()
+    definitions = {"a": "desc a", "b": "desc b"}
+    team.bulk_define_kpis(definitions)
+    # KPIs defined and initialized to 0
+    assert team.get_kpi("a") == 0
+    assert team.get_kpi("b") == 0
+    kpis = team.get_all_kpis()
+    assert set(kpis.keys()) == {"a", "b"}
+
+def test_report_kpis():
+    team = DreamTeam()
+    defs = {"x": "desc x", "y": "desc y"}
+    team.bulk_define_kpis(defs)
+    team.increment_kpi("x", 1)
+    team.increment_kpi("y", 2)
+    report = team.report_kpis()
+    assert "x: 1 (desc x)" in report
+    assert "y: 2 (desc y)" in report
