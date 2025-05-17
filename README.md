@@ -1,9 +1,25 @@
-[![CI](https://github.com/mipsou/dreamteam/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mipsou/dreamteam/actions/workflows/ci.yml)
-[![Release](https://github.com/mipsou/dreamteam/actions/workflows/release.yml/badge.svg)](https://github.com/mipsou/dreamteam/actions/workflows/release.yml)
-[![PyPI version](https://img.shields.io/pypi/v/dreamteam.svg)](https://pypi.org/project/dreamteam/)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-# Dreamteam Crew
+[![CI](https://img.shields.io/github/actions/workflow/status/mipsou/dreamteam/ci.yml?branch=main&style=flat-square&color=blue)](https://github.com/mipsou/dreamteam/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/mipsou/dreamteam?style=flat-square&color=brightgreen)](https://github.com/mipsou/dreamteam/releases)
+[![PyPI version](https://img.shields.io/pypi/v/dreamteam?style=flat-square&color=orange)](https://pypi.org/project/dreamteam/)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue?style=flat-square)](https://opensource.org/licenses/Apache-2.0)
+[![Docs](https://img.shields.io/badge/docs-crewAI-blue?style=flat-square)](https://docs.crewai.com)
 
+# Dreamteam Crew
++ *Orchestrate your AI crew with ease.*  
++
++ ---  
++
++ ## Table of Contents  
++ - 🚀 [Installation](#installation)  
++ - ⚙️ [Usage](#usage)  
++ - 📖 [Memory System Concepts](#memory-system-concepts)  
++ - 🖥️ [CrewAI Studio Integration](#crewai-studio-integration)  
++ - 🔌 [Plugins](#plugins)  
++ - 🧪 [Testing](#testing)  
++ - 💖 [Contributing](#contributing)  
++ - 📄 [License](#license)  
++
++ ---
 Welcome to the Dreamteam Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
 
 ## Installation
@@ -106,8 +122,7 @@ dreamteam crewai_test
 This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
 
 ### Memory System Concepts
-La documentation complète est disponible ici :
-> https://docs.crewai.com/concepts/memory
+La documentation complète est disponible ici : [![Docs](https://img.shields.io/badge/docs-memory-brightgreen?style=flat-square)](https://docs.crewai.com/concepts/memory)
 
 Ce document couvre les sections suivantes :
 1. Introduction to Memory Systems in CrewAI
