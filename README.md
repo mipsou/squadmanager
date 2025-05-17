@@ -1,9 +1,11 @@
 <p align="center">
+<p align="center">
 <img src="https://img.shields.io/github/actions/workflow/status/mipsou/dreamteam/ci.yml?branch=main&style=flat-square&color=blue" alt="CI" />
 <img src="https://img.shields.io/github/v/release/mipsou/dreamteam?style=flat-square&color=brightgreen" alt="Release" />
 <img src="https://img.shields.io/pypi/v/dreamteam?style=flat-square&color=orange" alt="PyPI version" />
 <img src="https://img.shields.io/badge/License-Apache%202.0-blue?style=flat-square" alt="License" />
 <img src="https://img.shields.io/badge/docs-crewAI-blue?style=flat-square" alt="Docs" />
+</p>
 </p>
 
 # Dreamteam Crew
