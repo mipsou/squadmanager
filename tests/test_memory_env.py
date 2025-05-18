@@ -3,7 +3,7 @@ from pathlib import Path
 import appdirs
 import pytest
 
-from dreamteam.memory import MemoryManager
+from squadmanager.memory import MemoryManager
 
 
 def test_default_paths_without_env(monkeypatch, tmp_path):

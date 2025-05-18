@@ -1,12 +1,12 @@
 """
-Core module for DreamTeam
+Core module for squadmanager
 """
 
 import os
 # Directory where teams are stored (corrected folder name)
 TEAMS_DIR = r"D:\Scripts\Teams"
 
-class DreamTeam:
+class squadmanager:
     def __init__(self):
         self.projects = {}
         self.teams = {}
@@ -97,7 +97,7 @@ class DreamTeam:
         return assigned
 
     def send_message(self, team: str, message: str) -> str:
-        """Send a message from a team to DreamTeam."""
+        """Send a message from a team to squadmanager."""
         if team not in self.teams:
             raise ValueError(f"Team {team} does not exist")
         self.messages.setdefault(team, []).append(message)

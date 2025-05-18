@@ -1,6 +1,6 @@
 import os
 import requests
-from dreamteam.connectors import ExternalPlugin
+from squadmanager.connectors import ExternalPlugin
 
 
 class StudioPlugin(ExternalPlugin):

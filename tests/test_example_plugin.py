@@ -1,8 +1,8 @@
 import sys
 import pytest
 import importlib.metadata
-from dreamteam.plugin_manager import PluginManager
-from dreamteam.plugins.example_plugin import ExamplePlugin
+from squadmanager.plugin_manager import PluginManager
+from squadmanager.plugins.example_plugin import ExamplePlugin
 
 # Dummy entry point to simulate importlib.metadata entry_points
 class DummyEP:
@@ -16,7 +16,7 @@ class DummyEP:
 def test_example_plugin_loaded(monkeypatch):
     # Monkeypatch entry_points to return our example plugin EP
     def fake_entry_points(group=None):
-        if group == 'dreamteam.plugins':
+        if group == 'squadmanager.plugins':
             return [DummyEP('example', ExamplePlugin)]
         return []
     monkeypatch.setattr(importlib.metadata, 'entry_points', fake_entry_points)

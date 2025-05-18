@@ -5,11 +5,11 @@ from datetime import datetime, timedelta
 from pathlib import Path
 import pytest
 
-from dreamteam.cli import cli
+from squadmanager.cli import cli
 
 
 def run_cli(args):
-    sys.argv = ['dreamteam'] + args
+    sys.argv = ['squadmanager'] + args
     return cli()
 
 

@@ -4,13 +4,13 @@ import shutil
 import sqlite3
 import yaml
 
-# Script de scaffolding pour créer la structure 'dreamteam' avec mémoire et subteams
+# Script de scaffolding pour créer la structure 'squadmanager' avec mémoire et subteams
 
 def backup_config():
     backup_dir = os.path.join("backup", "old_config", "config")
     os.makedirs(backup_dir, exist_ok=True)
-    for fname in [os.path.join("src", "dreamteam", "config", "agents.yaml"),
-                  os.path.join("src", "dreamteam", "config", "tasks.yaml")]:
+    for fname in [os.path.join("src", "squadmanager", "config", "agents.yaml"),
+                  os.path.join("src", "squadmanager", "config", "tasks.yaml")]:
         if os.path.exists(fname):
             dst = os.path.join(backup_dir, os.path.basename(fname) + ".bak")
             shutil.copy(fname, dst)
@@ -19,10 +19,10 @@ def backup_config():
 
 def create_dirs():
     paths = [
-        os.path.join("src", "dreamteam", "config"),
-        os.path.join("src", "dreamteam", "subteams", "marketing", "config"),
-        os.path.join("src", "dreamteam", "tools"),
-        os.path.join("src", "dreamteam", "memory"),
+        os.path.join("src", "squadmanager", "config"),
+        os.path.join("src", "squadmanager", "subteams", "marketing", "config"),
+        os.path.join("src", "squadmanager", "tools"),
+        os.path.join("src", "squadmanager", "memory"),
     ]
     for p in paths:
         os.makedirs(p, exist_ok=True)
@@ -72,7 +72,7 @@ Chefs_de_projet:
   goal: "Servir d'intermédiaire entre clients et IA"
   backstory: "Managers projet IA, communication client-projet."
 """
-    agents_yaml = os.path.join("src", "dreamteam", "config", "agents.yaml")
+    agents_yaml = os.path.join("src", "squadmanager", "config", "agents.yaml")
     with open(agents_yaml, "w", encoding="utf-8") as f:
         f.write(main_agents)
     print(f"Écriture de {agents_yaml}")
@@ -102,7 +102,7 @@ Chefs_de_projet:
   agent: Conseil_IA
   description: Évaluer actions du DG et proposer améliorations
 """
-    tasks_yaml = os.path.join("src", "dreamteam", "config", "tasks.yaml")
+    tasks_yaml = os.path.join("src", "squadmanager", "config", "tasks.yaml")
     with open(tasks_yaml, "w", encoding="utf-8") as f:
         f.write(main_tasks)
     print(f"Écriture de {tasks_yaml}")
@@ -128,11 +128,11 @@ Redacteur_IA:
   agent: Redacteur_IA
   description: Publier l'article sur LinkedIn et analyser engagement
 """
-    m_agents_yaml = os.path.join("src", "dreamteam", "subteams", "marketing", "config", "agents.yaml")
+    m_agents_yaml = os.path.join("src", "squadmanager", "subteams", "marketing", "config", "agents.yaml")
     with open(m_agents_yaml, "w", encoding="utf-8") as f:
         f.write(m_agents)
     print(f"Écriture de {m_agents_yaml}")
-    m_tasks_yaml = os.path.join("src", "dreamteam", "subteams", "marketing", "config", "tasks.yaml")
+    m_tasks_yaml = os.path.join("src", "squadmanager", "subteams", "marketing", "config", "tasks.yaml")
     with open(m_tasks_yaml, "w", encoding="utf-8") as f:
         f.write(m_tasks)
     print(f"Écriture de {m_tasks_yaml}")
@@ -146,16 +146,16 @@ memory_policy:
     evaluation_dg: important
     task_completed: normal
 """
-    mem_conf_path = os.path.join("src", "dreamteam", "memory", "config.yaml")
+    mem_conf_path = os.path.join("src", "squadmanager", "memory", "config.yaml")
     with open(mem_conf_path, "w", encoding="utf-8") as f:
         f.write(mem_conf)
     print(f"Écriture de {mem_conf_path}")
 
     # Create history.jsonl and org_memory.db
-    hist = os.path.join("src", "dreamteam", "memory", "history.jsonl")
+    hist = os.path.join("src", "squadmanager", "memory", "history.jsonl")
     open(hist, "a").close()
     print(f"Création de {hist}")
-    db = os.path.join("src", "dreamteam", "memory", "org_memory.db")
+    db = os.path.join("src", "squadmanager", "memory", "org_memory.db")
     conn = sqlite3.connect(db)
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS events (
@@ -185,10 +185,10 @@ def log_event(event_type, data):
     """Ajoute un événement dans history.jsonl et org_memory.db"""
     evt = {"timestamp": data.get('timestamp'), "event_type": event_type, "data": data}
     # history.jsonl
-    with open(os.path.join('src', 'dreamteam', 'memory', 'history.jsonl'), 'a') as f:
+    with open(os.path.join('src', 'squadmanager', 'memory', 'history.jsonl'), 'a') as f:
         f.write(json.dumps(evt) + '\n')
     # org_memory.db
-    conn = sqlite3.connect(os.path.join('src', 'dreamteam', 'memory', 'org_memory.db'))
+    conn = sqlite3.connect(os.path.join('src', 'squadmanager', 'memory', 'org_memory.db'))
     c = conn.cursor()
     c.execute("INSERT INTO events VALUES (?, ?, ?)", (evt['timestamp'], evt['event_type'], json.dumps(evt)))
     conn.commit()
@@ -196,7 +196,7 @@ def log_event(event_type, data):
     print("Événement enregistré:", event_type)
 '''    }
     for name, code in tools.items():
-        path = os.path.join("src", "dreamteam", "tools", name)
+        path = os.path.join("src", "squadmanager", "tools", name)
         with open(path, "w", encoding="utf-8") as f:
             f.write(code)
         print(f"Écriture de {path}")
@@ -206,13 +206,13 @@ def log_event(event_type, data):
 agents_needed: marketing
 clients: []
 """
-    with open(os.path.join("src", "dreamteam", "pdg_input.yaml"), "w", encoding="utf-8") as f:
+    with open(os.path.join("src", "squadmanager", "pdg_input.yaml"), "w", encoding="utf-8") as f:
         f.write(pdg)
     print("Écriture de pdg_input.yaml")
     client = """
 client_request: "Article IA optimisé SEO"
 """
-    with open(os.path.join("src", "dreamteam", "client_input.yaml"), "w", encoding="utf-8") as f:
+    with open(os.path.join("src", "squadmanager", "client_input.yaml"), "w", encoding="utf-8") as f:
         f.write(client)
     print("Écriture de client_input.yaml")
 
@@ -221,7 +221,7 @@ def main():
     backup_config()
     create_dirs()
     write_templates()
-    print("Structure DreamTeam générée avec succès.")
+    print("Structure squadmanager générée avec succès.")
 
 if __name__ == "__main__":
     main()

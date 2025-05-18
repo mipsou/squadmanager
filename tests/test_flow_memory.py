@@ -1,8 +1,8 @@
 import pytest
 
-from dreamteam.flow import DreamteamFlow, DreamteamState
-import dreamteam.flow as flow_module
-from dreamteam.crew import Dreamteam
+from squadmanager.flow import DreamteamFlow, DreamteamState
+import squadmanager.flow as flow_module
+from squadmanager.crew import squadmanager
 
 class FakeCrew:
     def __init__(self):
@@ -25,7 +25,7 @@ def stub_dependencies(monkeypatch):
     """Stub MemoryManager et Crew pour tests flow_memory."""
     mem_mgr = FakeMemMgr()
     monkeypatch.setattr(flow_module, 'MemoryManager', lambda: mem_mgr)
-    monkeypatch.setattr(Dreamteam, 'crew', lambda self: FakeCrew())
+    monkeypatch.setattr(squadmanager, 'crew', lambda self: FakeCrew())
     return mem_mgr
 
 def test_run_flow_memory(monkeypatch):

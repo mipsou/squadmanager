@@ -3,24 +3,24 @@ import os
 import subprocess
 import sys
 from datetime import datetime
-from dreamteam.core import DreamTeam
-from dreamteam.flow import DreamteamFlow, DreamteamState
+from squadmanager.core import squadmanager
+from squadmanager.flow import DreamteamFlow, DreamteamState
 import json
 import sqlite3
-from dreamteam.memory import MemoryManager
-from dreamteam.memory_policy import MemoryPolicy
-from dreamteam.plugin_manager import PluginManager
+from squadmanager.memory import MemoryManager
+from squadmanager.memory_policy import MemoryPolicy
+from squadmanager.plugin_manager import PluginManager
 from importlib.metadata import version as _version, PackageNotFoundError
 import requests
 import webbrowser
 
 try:
-    __version__ = _version('dreamteam')
+    __version__ = _version('squadmanager')
 except PackageNotFoundError:
     __version__ = '0.0.0'
 
 def cli():
-    parser = argparse.ArgumentParser(prog="dreamteam")
+    parser = argparse.ArgumentParser(prog="squadmanager")
     parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
     subparsers = parser.add_subparsers(dest="command", required=True)
 
@@ -95,10 +95,10 @@ def cli():
     sd.add_argument("--plugin", required=True, help="Nom du plugin")
     sd.add_argument("--payload", required=True, help="Payload JSON de l'événement")
 
-    # Flow Dreamteam via CrewAI Flows
+    # Flow squadmanager via CrewAI Flows
     sp = subparsers.add_parser(
         "flow",
-        help="Lancer le flow Dreamteam via CrewAI Flows"
+        help="Lancer le flow squadmanager via CrewAI Flows"
     )
     sp.add_argument(
         "--topic",
@@ -139,7 +139,7 @@ def cli():
     sp = subparsers.add_parser("list_kpis", help="List all KPIs")
 
     args = parser.parse_args()
-    team = DreamTeam()
+    team = squadmanager()
     if args.command == "create_project":
         print(team.create_project(args.name))
     elif args.command == "create_team":
@@ -242,7 +242,7 @@ def cli():
             plugin.send_event(payload)
             return
     elif args.command == "flow":
-        # Exécuter le flow Dreamteam
+        # Exécuter le flow squadmanager
         state = DreamteamState(topic=args.topic, year=args.year)
         try:
             DreamteamFlow().run_flow(state)

@@ -10,7 +10,7 @@ class MemoryManager:
     """Gère l'historique JSONL et la base de données SQLite pour la mémoire."""
     def __init__(self, history_file: str = None, db_file: str = None):
         # Determine base storage directory via env or appdirs
-        base_dir = Path(os.environ.get("CREWAI_STORAGE_DIR", appdirs.user_data_dir("dreamteam")))
+        base_dir = Path(os.environ.get("CREWAI_STORAGE_DIR", appdirs.user_data_dir("squadmanager")))
         # Setup history file path
         if history_file:
             self.history_path = Path(history_file)

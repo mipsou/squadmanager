@@ -11,8 +11,8 @@ import pytest
 import yaml
 from pathlib import Path
 
-import dreamteam.crew as crew_module
-from dreamteam.crew import Dreamteam
+import squadmanager.crew as crew_module
+from squadmanager.crew import squadmanager
 
 import crewai.memory as memory_module
 import crewai.memory.storage.rag_storage as rag_storage_module
@@ -44,7 +44,7 @@ class FakeCrew:
 
 @pytest.fixture(autouse=True)
 def stub_memory_injection(monkeypatch):
-    # Stub Dreamteam crew création
+    # Stub squadmanager crew création
     monkeypatch.setattr(crew_module, 'Crew', FakeCrew)
     # Stub memory classes
     monkeypatch.setattr(memory_module, 'ShortTermMemory', DummyShortTermMemory, raising=False)
@@ -82,7 +82,7 @@ def test_memory_config_injection(tmp_path):
     }
     (config_dir / 'memory.yaml').write_text(yaml.dump(mem_conf))
     # Instantiate with config_path
-    dt = Dreamteam(config_path=str(config_dir))
+    dt = squadmanager(config_path=str(config_dir))
     crew_inst = dt.crew()
     kwargs = crew_inst.kwargs
     # Validate native memory flag

@@ -1,8 +1,8 @@
 from datetime import datetime
 from datetime import datetime as dt
 from pydantic import BaseModel
-from dreamteam.crew import Dreamteam
-from dreamteam.memory import MemoryManager
+from squadmanager.crew import squadmanager
+from squadmanager.memory import MemoryManager
 
 # Stub Flow et start decorator par défaut
 class Flow:
@@ -29,7 +29,7 @@ class DreamteamState(BaseModel):
 class DreamteamFlow(Flow):
     @start
     def run_flow(self, state: DreamteamState):
-        """Kickoff Dreamteam crew via Flow avec orchestration de la mémoire."""
+        """Kickoff squadmanager crew via Flow avec orchestration de la mémoire."""
         # Orchestrer la mémoire externe (workflow étoile)
         mem_mgr = MemoryManager()
         # Charger l'historique
@@ -37,7 +37,7 @@ class DreamteamFlow(Flow):
         # Journaliser l'état avant exécution
         mem_mgr.append_event({"event": "start_flow", "state": state.model_dump()})
         # Exécuter la crew
-        crew = Dreamteam().crew()
+        crew = squadmanager().crew()
         # Archive crew instance pour tests
         self._last_crew = crew
         crew.kickoff(inputs=state.model_dump())

@@ -2,7 +2,7 @@ import json
 import sqlite3
 from pathlib import Path
 import pytest
-from dreamteam.memory import MemoryManager
+from squadmanager.memory import MemoryManager
 
 
 def test_init_db_creates_events_table(tmp_path):

@@ -1,6 +1,6 @@
 import os
 import sentry_sdk
-from dreamteam.connectors import ExternalPlugin
+from squadmanager.connectors import ExternalPlugin
 
 
 class SentryPlugin(ExternalPlugin):

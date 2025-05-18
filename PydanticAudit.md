@@ -1,9 +1,9 @@
 # Audit Pydantic V1 vs V2
 
-## 1. Usage dans le projet DreamTeam
+## 1. Usage dans le projet squadmanager
 
-- **src/dreamteam/crew.py** : utilise `BaseModel` (via CrewAI Core), `@field_validator`, `@model_validator` (Pydantic V1).
-- **src/dreamteam/tools/custom_tool.py** : initialement V1, migré vers V2 en ajoutant `model_config: ConfigDict`, usage de V2 validators.
+- **src/squadmanager/crew.py** : utilise `BaseModel` (via CrewAI Core), `@field_validator`, `@model_validator` (Pydantic V1).
+- **src/squadmanager/tools/custom_tool.py** : initialement V1, migré vers V2 en ajoutant `model_config: ConfigDict`, usage de V2 validators.
 
 ## 2. Usage dans les dépendances CrewAI
 

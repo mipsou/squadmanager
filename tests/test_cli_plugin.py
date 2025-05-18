@@ -4,7 +4,7 @@ import pytest
 from contextlib import redirect_stdout
 from io import StringIO
 
-from dreamteam.cli import cli
+from squadmanager.cli import cli
 
 class DummyPMList:
     def __init__(self, config=None): pass
@@ -12,7 +12,7 @@ class DummyPMList:
 
 
 def run_cli_and_capture(monkeypatch, args):
-    monkeypatch.setattr(sys, 'argv', ['dreamteam'] + args)
+    monkeypatch.setattr(sys, 'argv', ['squadmanager'] + args)
     buf = StringIO()
     with redirect_stdout(buf):
         cli()
@@ -20,7 +20,7 @@ def run_cli_and_capture(monkeypatch, args):
 
 
 def test_cli_plugin_list(monkeypatch):
-    import dreamteam.cli as cli_mod
+    import squadmanager.cli as cli_mod
     monkeypatch.setattr(cli_mod, 'PluginManager', DummyPMList)
     out = run_cli_and_capture(monkeypatch, ['plugin', 'list'])
     lines = out.splitlines()
@@ -39,14 +39,14 @@ class DummyPMHealth:
 
 
 def test_cli_plugin_health(monkeypatch):
-    import dreamteam.cli as cli_mod
+    import squadmanager.cli as cli_mod
     monkeypatch.setattr(cli_mod, 'PluginManager', DummyPMHealth)
     out = run_cli_and_capture(monkeypatch, ['plugin', 'health', '--plugin', 'test'])
     assert json.loads(out) == {"ok": True}
 
 
 def test_cli_plugin_send(monkeypatch):
-    import dreamteam.cli as cli_mod
+    import squadmanager.cli as cli_mod
     dp = DummyPlugin()
     class DummyPMSend(DummyPMHealth):
         def __init__(self, config=None):

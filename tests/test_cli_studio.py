@@ -2,7 +2,7 @@ import sys
 import pytest
 import requests
 import webbrowser
-from dreamteam.cli import cli
+from squadmanager.cli import cli
 
 class DummyResp:
     def __init__(self, data):
@@ -17,7 +17,7 @@ def test_studio_status(monkeypatch, capsys):
     # Mock requests.get
     monkeypatch.setattr(requests, 'get', lambda url, headers: DummyResp({'status': 'ok'}))
     # Simulate CLI args
-    monkeypatch.setattr(sys, 'argv', ['dreamteam', 'studio', '--status'])
+    monkeypatch.setattr(sys, 'argv', ['squadmanager', 'studio', '--status'])
     with pytest.raises(SystemExit) as exc:
         cli()
     assert exc.value.code == 0
@@ -30,7 +30,7 @@ def test_studio_open(monkeypatch):
     calls = []
     # Mock webbrowser.open
     monkeypatch.setattr(webbrowser, 'open', lambda url: calls.append(url))
-    monkeypatch.setattr(sys, 'argv', ['dreamteam', 'studio', '--open'])
+    monkeypatch.setattr(sys, 'argv', ['squadmanager', 'studio', '--open'])
     with pytest.raises(SystemExit) as exc:
         cli()
     assert exc.value.code == 0
