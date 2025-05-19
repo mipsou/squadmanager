@@ -259,6 +259,8 @@ def cli():
         if args.command == "crewai_test":
             try:
                 subprocess.run(["crewai", "test"], check=True)
+            except FileNotFoundError:
+                sys.exit("Erreur : CrewAI CLI introuvable. Installez-la via `pip install crewai`.")
             except subprocess.CalledProcessError as e:
                 sys.exit(e.returncode)
         return
