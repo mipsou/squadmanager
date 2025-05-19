@@ -2,12 +2,13 @@ from squadmanager.connectors import ExternalPlugin
 
 
 class ExamplePlugin(ExternalPlugin):
-    """Plugin d'exemple pour démontrer le système de plugins."""
+    """Plugin d'exemple renvoyant un statut ok et affichant un événement"""
+
+    def __init__(self, config: dict):
+        super().__init__(config)
 
     def health_check(self) -> dict:
-        """Retourne un status simulé."""
-        return {"example": "ok"}
+        return {'example': 'ok'}
 
     def send_event(self, payload: dict) -> None:
-        """Reçoit un payload et simule un envoi (log)."""
         print(f"ExamplePlugin: sent event {payload}")

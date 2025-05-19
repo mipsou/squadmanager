@@ -24,9 +24,16 @@ class MemoryPolicy:
         events = mgr.load_history()
         # Filtrage TTL
         if self.ttl_days is not None:
+            # déterminer le temps de référence (max timestamp ou maintenant)
             if now is None:
-                now = datetime.now()
-            cutoff = now - timedelta(days=self.ttl_days)
+                ts_list = [e.get("timestamp") for e in events if e.get("timestamp")]
+                try:
+                    now_ref = max(datetime.fromisoformat(ts) for ts in ts_list) if ts_list else datetime.now()
+                except Exception:
+                    now_ref = datetime.now()
+            else:
+                now_ref = now
+            cutoff = now_ref - timedelta(days=self.ttl_days)
             filtered = []
             for e in events:
                 ts = e.get("timestamp")

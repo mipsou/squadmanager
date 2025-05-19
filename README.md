@@ -48,7 +48,7 @@ Next, navigate to your project directory and install the dependencies:
 
 (Optional) Lock the dependencies and install them by using the CLI command:
 ```bash
-crewai install
+uv install
 ```
 
 ### Customizing

@@ -4,23 +4,21 @@ from squadmanager.connectors import ExternalPlugin
 
 
 class SentryPlugin(ExternalPlugin):
-    """Plugin pour intégrer Sentry via sentry-sdk."""
+    """Sentry plugin pour initialisation et envoi d'événements."""
 
     def __init__(self, config: dict):
         super().__init__(config)
         dsn = config.get('dsn') or os.getenv('CREWAI_SENTRY_DSN')
         if not dsn:
-            raise ValueError("Le DSN Sentry est manquant. Définir CREWAI_SENTRY_DSN ou passer 'dsn' en config.")
+            raise ValueError('DSN Sentry est manquant')
         sentry_sdk.init(dsn=dsn)
+        self.dsn = dsn
 
     def health_check(self) -> dict:
-        """Vérifie l'initialisation de Sentry."""
-        return {"sentry": "initialized"}
+        return {'sentry': 'initialized'}
 
     def send_event(self, payload: dict) -> None:
-        """Envoie un événement ou exception à Sentry."""
-        exc = payload.get('exception')
-        if exc:
-            sentry_sdk.capture_exception(exc)
+        if 'exception' in payload:
+            sentry_sdk.capture_exception(payload['exception'])
         else:
             sentry_sdk.capture_message(str(payload))
