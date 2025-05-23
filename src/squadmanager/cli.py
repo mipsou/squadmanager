@@ -133,7 +133,8 @@ def cli():
   import-task <file> Importer la tâche
   delete-crew <id> Supprimer le crew
   delete-agent <id> Supprimer l'agent
-  serve          Lancer l'interface locale de CrewAI Studio (Streamlit)'''
+  serve          Lancer l'interface locale de CrewAI Studio (Streamlit)
+  stop           Arrêter l'interface locale de CrewAI Studio (Streamlit)'''
     )
     sp.add_argument("--status", action="store_true", help="Vérifier la connexion à CrewAI Studio")
     sp.add_argument("--open", action="store_true", help="Ouvrir CrewAI Studio dans le navigateur")
@@ -168,6 +169,7 @@ def cli():
     delete_ag = studio_sp.add_parser("delete-agent", help="Supprimer un agent depuis Studio")
     delete_ag.add_argument("agent_id", help="ID de l'agent à supprimer")
     studio_sp.add_parser("serve", help="Lancer l'interface locale de CrewAI Studio (Streamlit)")
+    studio_sp.add_parser("stop", help="Arrêter l'interface locale de CrewAI Studio (Streamlit)")
 
     # Plugin commands
     sp = subparsers.add_parser("plugin", help="Gestion des plugins")
@@ -354,6 +356,16 @@ def cli():
             # Lancement de l'UI locale via Streamlit
             backend_dir = os.getenv("CREWAI_STUDIO_BACKEND_DIR") or Path("D:/Scripts/CrewAI-Studio/app").as_posix()
             subprocess.run([sys.executable, "-m", "streamlit", "run", "app.py", "--server.port", "8501"], cwd=backend_dir, check=True)
+            sys.exit(0)
+        if args.studio_cmd == "stop":
+            # Arrêt de l'UI locale via Streamlit
+            proc = subprocess.run(['netstat', '-ano'], capture_output=True, text=True, check=True)
+            for line in proc.stdout.splitlines():
+                parts = line.split()
+                if len(parts) >= 5 and parts[1].endswith(':8501') and parts[3] == 'LISTENING':
+                    pid = parts[-1]
+                    subprocess.run(['taskkill', '/PID', pid, '/F'], check=True)
+            print('Streamlit arrêté.')
             sys.exit(0)
         if args.studio_cmd == "list":
             print(yaml.safe_dump(plugin.list_crews(), allow_unicode=True, sort_keys=False))

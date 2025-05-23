@@ -133,3 +133,40 @@ def test_studio_serve_default_dir(monkeypatch):
     # Fallback devrait être 'D:/Scripts/CrewAI-Studio/app'
     assert calls[0][1].endswith('D:/Scripts/CrewAI-Studio/app')
     assert calls[0][0] == [sys.executable, '-m', 'streamlit', 'run', 'app.py', '--server.port', '8501']
+
+def test_studio_stop_kills_process(monkeypatch, capsys):
+    netstat_output = 'TCP    0.0.0.0:8501    0.0.0.0:0    LISTENING    12345\n'
+    calls = []
+    class FakeProc:
+        def __init__(self, stdout):
+            self.stdout = stdout
+    def fake_run(args, capture_output=True, text=True, check=True, cwd=None):
+        if args[0] == 'netstat':
+            return FakeProc(netstat_output)
+        calls.append(args)
+        return FakeProc('')
+    monkeypatch.setattr(subprocess, 'run', fake_run)
+    monkeypatch.setattr(sys, 'argv', ['squadmanager', 'studio', 'stop'])
+    with pytest.raises(SystemExit) as exc:
+        cli()
+    assert exc.value.code == 0
+    assert calls == [['taskkill', '/PID', '12345', '/F']]
+    assert capsys.readouterr().out.strip() == 'Streamlit arrêté.'
+
+def test_studio_stop_no_process(monkeypatch, capsys):
+    netstat_output = 'TCP    0.0.0.0:8502    0.0.0.0:0    LISTENING    12345\n'
+    calls = []
+    class FakeProc:
+        def __init__(self, stdout):
+            self.stdout = stdout
+    def fake_run(args, capture_output=True, text=True, check=True, cwd=None):
+        if args[0] == 'netstat':
+            return FakeProc(netstat_output)
+        calls.append(args)
+        return FakeProc('')
+    monkeypatch.setattr(subprocess, 'run', fake_run)
+    monkeypatch.setattr(sys, 'argv', ['squadmanager', 'studio', 'stop'])
+    with pytest.raises(SystemExit):
+        cli()
+    assert calls == []
+    assert capsys.readouterr().out.strip() == 'Streamlit arrêté.'
