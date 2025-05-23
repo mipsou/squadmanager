@@ -128,11 +128,12 @@ def cli():
   list-agents     Lister les agents
   export-agent <id> Exporter l'agent
   import-agent <file> Importer l'agent
-  delete-crew <id> Supprimer le crew
-  delete-agent <id> Supprimer l'agent
   list-tasks      Lister les tâches
   export-task <id> Exporter la tâche
-  import-task <file> Importer la tâche'''
+  import-task <file> Importer la tâche
+  delete-crew <id> Supprimer le crew
+  delete-agent <id> Supprimer l'agent
+  serve          Lancer l'interface locale de CrewAI Studio (Streamlit)'''
     )
     sp.add_argument("--status", action="store_true", help="Vérifier la connexion à CrewAI Studio")
     sp.add_argument("--open", action="store_true", help="Ouvrir CrewAI Studio dans le navigateur")
@@ -166,6 +167,7 @@ def cli():
     delete_cr.add_argument("crew_id", help="ID du crew à supprimer")
     delete_ag = studio_sp.add_parser("delete-agent", help="Supprimer un agent depuis Studio")
     delete_ag.add_argument("agent_id", help="ID de l'agent à supprimer")
+    studio_sp.add_parser("serve", help="Lancer l'interface locale de CrewAI Studio (Streamlit)")
 
     # Plugin commands
     sp = subparsers.add_parser("plugin", help="Gestion des plugins")
@@ -347,6 +349,11 @@ def cli():
             sys.exit(0)
         if args.open:
             plugin.open_ui()
+            sys.exit(0)
+        if args.studio_cmd == "serve":
+            # Lancement de l'UI locale via Streamlit
+            backend_dir = os.getenv("CREWAI_STUDIO_BACKEND_DIR") or Path("D:/Scripts/CrewAI-Studio/app").as_posix()
+            subprocess.run([sys.executable, "-m", "streamlit", "run", "app.py", "--server.port", "8501"], cwd=backend_dir, check=True)
             sys.exit(0)
         if args.studio_cmd == "list":
             print(yaml.safe_dump(plugin.list_crews(), allow_unicode=True, sort_keys=False))
