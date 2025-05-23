@@ -61,33 +61,41 @@ uv install
 - Modify `src/squadmanager/crew.py` to add your own logic, tools and specific args
 - Modify `src/squadmanager/main.py` to add custom inputs for your agents and tasks
 
-## Installation CrewAI Studio
+## Installation CrewAI Studio Backend
+Pour configurer et lancer le **backend REST** de CrewAI Studio :
 
-Pour configurer et lancer le Studio :
+1. Installer le package ou cloner le dépôt :
+   - Depuis PyPI :
+     ```bash
+     pip install crewai-studio-backend
+     ```
+   - Ou cloner et installer :
+     ```bash
+     git clone https://github.com/crew-ai/crewai-studio-backend.git
+     cd crewai-studio-backend
+     pip install -r requirements.txt
+     ```
 
-1. Cloner le dépôt CrewAI-Studio et se placer dedans  
+2. Lancer le serveur REST via Uvicorn :
    ```bash
-   git clone https://github.com/mipsou/CrewAI-Studio.git
-   cd CrewAI-Studio
-   ```
-2. Créer et activer l’environnement conda (via `environment.yml`) :  
-   ```bash
-   conda env create -f environment.yml
-   conda activate crewai-studio
-   pip install uv
-   ```
-3. Lancer le script d’installation pour configurer les caches sur D:  
-   ```powershell
-   .\install_venv.bat
-   ```
-4. Démarrer l’environnement et Playwright :  
-   ```powershell
-   .\run_venv.bat
+   uvicorn crewai_studio.main:app --reload --port 8000
    ```
 
-> Les variables d’environnement définies dans ces scripts  
-> (`PIP_CACHE_DIR`, `XDG_CACHE_HOME`, `PLAYWRIGHT_BROWSERS_PATH`)  
-> pointent vers `D:\Scripts\CrewAI-Studio\.cache` pour préserver l’espace sur C:.
+3. Vérifier le service :
+   ```bash
+   curl http://localhost:8000/api/status
+   ```
+
+4. Configurer la CLI :
+   ```bash
+   export CREWAI_STUDIO_URL=http://localhost:8000  # Windows : set CREWAI_STUDIO_URL=...
+   ```
+
+5. Importer et lister un crew :
+   ```bash
+   squadmanager studio import path/to/squadmanagerAI.yml
+   squadmanager studio list
+   ```
 
 ## Running the Project
 
