@@ -146,3 +146,25 @@ class squadmanager:
         """Generate a textual report of KPIs."""
         lines = [f"{name}: {info['value']} ({info['description']})" for name, info in self.kpis.items()]
         return "\n".join(lines)
+
+    def export_all(self) -> dict:
+        """
+        Export all data to a dict.
+        """
+        return {
+            "projects": self.projects,
+            "teams": self.teams,
+            "team_projects": self.team_projects,
+            "messages": self.messages,
+            "kpis": self.kpis,
+        }
+
+    def import_all(self, data: dict) -> None:
+        """
+        Import data from a dict.
+        """
+        self.projects = data.get("projects", {})
+        self.teams = data.get("teams", {})
+        self.team_projects = data.get("team_projects", {})
+        self.messages = data.get("messages", {})
+        self.kpis = data.get("kpis", {})
