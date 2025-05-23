@@ -39,9 +39,13 @@ class StudioPlugin(ExternalPlugin):
         ui_url = os.getenv('CREWAI_STUDIO_UI_URL')
         if not ui_url:
             parsed = urlparse(self.url)
-            # Conserver scheme, remplacer port par 8501
-            netloc = f"{parsed.hostname}:8501"
-            ui_url = urlunparse(parsed._replace(netloc=netloc))
+            # Si localhost, ouvrir UI Streamlit sur port 8501
+            if parsed.hostname in ('localhost', '127.0.0.1'):
+                netloc = f"{parsed.hostname}:8501"
+                ui_url = urlunparse(parsed._replace(netloc=netloc))
+            else:
+                # Instance publique ou distante : ouvrir tel quelle
+                ui_url = self.url
         webbrowser.open(ui_url)
 
     def list_crews(self) -> list:
