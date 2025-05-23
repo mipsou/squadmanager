@@ -170,3 +170,48 @@ def test_studio_stop_no_process(monkeypatch, capsys):
         cli()
     assert calls == []
     assert capsys.readouterr().out.strip() == 'Streamlit arrêté.'
+
+def test_studio_restart_with_backend_dir(monkeypatch, capsys):
+    # Simule un backend dir via env
+    netstat_output = 'TCP    0.0.0.0:8501    0.0.0.0:0    LISTENING    34567\n'
+    calls = []
+    class FakeProc:
+        def __init__(self, stdout):
+            self.stdout = stdout
+    def fake_run(args, capture_output=True, text=True, check=True, cwd=None):
+        if args[0] == 'netstat':
+            return FakeProc(netstat_output)
+        calls.append((args, cwd))
+        return FakeProc('')
+    monkeypatch.setenv('CREWAI_STUDIO_BACKEND_DIR', '/my/backend')
+    monkeypatch.setattr(subprocess, 'run', fake_run)
+    monkeypatch.setattr(sys, 'argv', ['squadmanager', 'studio', 'restart'])
+    with pytest.raises(SystemExit) as exc:
+        cli()
+    assert exc.value.code == 0
+    # Vérifie d'abord l'arrêt puis le lancement
+    assert calls[0] == (['taskkill', '/PID', '34567', '/F'], None)
+    assert calls[1] == ([sys.executable, '-m', 'streamlit', 'run', 'app.py', '--server.port', '8501'], '/my/backend')
+
+def test_studio_restart_default_dir(monkeypatch, capsys):
+    # Pas de backend dir -> fallback
+    netstat_output = 'TCP    0.0.0.0:8501    0.0.0.0:0    LISTENING    9876\n'
+    calls = []
+    class FakeProc:
+        def __init__(self, stdout):
+            self.stdout = stdout
+    def fake_run(args, capture_output=True, text=True, check=True, cwd=None):
+        if args[0] == 'netstat':
+            return FakeProc(netstat_output)
+        calls.append((args, cwd))
+        return FakeProc('')
+    monkeypatch.delenv('CREWAI_STUDIO_BACKEND_DIR', raising=False)
+    monkeypatch.setattr(subprocess, 'run', fake_run)
+    monkeypatch.setattr(sys, 'argv', ['squadmanager', 'studio', 'restart'])
+    with pytest.raises(SystemExit) as exc:
+        cli()
+    assert exc.value.code == 0
+    # Fallback doit utiliser le chemin par défaut
+    assert calls[0] == (['taskkill', '/PID', '9876', '/F'], None)
+    assert calls[1][0] == [sys.executable, '-m', 'streamlit', 'run', 'app.py', '--server.port', '8501']
+    assert capsys.readouterr().out.strip() == 'Streamlit arrêté.'
