@@ -19,7 +19,7 @@ jobs:
       - name: Test install package
         run: |
           pip install dist/*.whl
-          dreamteam --help
+          squadmanager --help
       - name: Publish to PyPI
         env:
           TWINE_USERNAME: __token__
