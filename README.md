@@ -104,6 +104,14 @@ Pour configurer et lancer le **backend REST** de CrewAI Studio :
    ```bash
   squadmanager studio serve
    ```
+8. Arrêter l'interface locale de CrewAI Studio :
+   ```bash
+  squadmanager studio stop
+   ```
+9. Redémarrer l'interface locale de CrewAI Studio :
+   ```bash
+  squadmanager studio restart
+   ```
 
 ## Running the Project
 
