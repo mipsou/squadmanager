@@ -39,6 +39,9 @@
 - [x] Créer plugin Sentry
 - [x] Créer plugin Studio
 - [x] Implémentation des commandes CLI plugin (list, health, send)
+- [x] Tests unitaires plugin Studio (import_crew, list_crews)
+- [x] Tests d'intégration plugin Studio (fixture uvicorn, import & list)
+- [x] Mise à jour README pour backend REST CrewAI Studio
 - [ ] Créer plugin Prometheus (non applicable, pas d'infra)
 - [ ] Intégrer Sentry pour logs/erreurs
 - [ ] Mettre en place métriques Prometheus/Grafana
