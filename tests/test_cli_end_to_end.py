@@ -9,7 +9,7 @@ import subprocess  # nécessaire pour subprocess.CompletedProcess
 @pytest.mark.integration
 def test_cli_run_end_to_end(tmp_path, monkeypatch):
     """
-    End-to-end test of CLI 'dreamteam run' ensuring crewai run is invoked and logs are produced.
+    End-to-end test of CLI 'squadmanager run' ensuring crewai run is invoked and logs are produced.
     """
     # Stub subprocess.run for 'crewai run'
     def fake_run(cmd, check, stdout=None, stderr=None, cwd=None, **kwargs):
@@ -26,9 +26,9 @@ def test_cli_run_end_to_end(tmp_path, monkeypatch):
     # Exécuter la CLI dans tmp_path avec l’argument 'run'
     orig_cwd = os.getcwd()
     os.chdir(tmp_path)
-    monkeypatch.setattr(sys, 'argv', ['dreamteam', 'run', '--once'])
+    monkeypatch.setattr(sys, 'argv', ['squadmanager', 'run', '--once'])
     try:
-        from dreamteam.cli import cli
+        from squadmanager.cli import cli
         cli()
     finally:
         os.chdir(orig_cwd)

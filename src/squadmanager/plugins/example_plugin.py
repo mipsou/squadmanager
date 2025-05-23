@@ -1,4 +1,4 @@
-from dreamteam.connectors import ExternalPlugin
+from squadmanager.connectors import ExternalPlugin
 
 
 class ExamplePlugin(ExternalPlugin):

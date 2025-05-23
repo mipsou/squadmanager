@@ -13,8 +13,8 @@ def test_end_to_end_run(tmp_path, monkeypatch):
         return subprocess.CompletedProcess(cmd, 0)
 
     monkeypatch.setattr(subprocess, "run", fake_run)
-    # Exécute la commande CLI dreamteam run
-    result = subprocess.run(["dreamteam", "run"], check=True, cwd=str(tmp_path))
+    # Exécute la commande CLI squadmanager run
+    result = subprocess.run(["squadmanager", "run"], check=True, cwd=str(tmp_path))
     # Vérifie la création et le contenu de report.md
     report_path = tmp_path / "report.md"
     assert report_path.exists(), "Le fichier report.md n'a pas été généré"

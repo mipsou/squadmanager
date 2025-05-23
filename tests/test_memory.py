@@ -2,7 +2,7 @@ import pytest
 from pathlib import Path
 import sqlite3
 
-from dreamteam.memory import MemoryManager
+from squadmanager.memory import MemoryManager
 
 
 def test_append_and_load_history(tmp_path):

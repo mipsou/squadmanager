@@ -1,7 +1,7 @@
 import os
 import pytest
 import requests
-from dreamteam.plugins.studio_plugin import StudioPlugin
+from squadmanager.plugins.studio_plugin import StudioPlugin
 
 class DummyResponse:
     def __init__(self, json_data):

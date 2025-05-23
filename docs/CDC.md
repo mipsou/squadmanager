@@ -1,4 +1,4 @@
-# Cahier des Charges (CDC) pour DreamTeam
+# Cahier des Charges (CDC) pour squadmanager
 Documentation officielle : https://docs.crewai.com/
 Documentation sur les tests CrewAI : https://docs.crewai.com/concepts/testing
 
@@ -20,10 +20,10 @@ uv tool install crewai
 uv tool list
 ```
 
-## Projet DreamTeam
+## Projet squadmanager
 
 **Mission**  
-DreamTeam est l’entité IA dédiée au service direct du PDG, concevant, déployant et pilotant des équipes autonomes pour exécuter des projets stratégiques, permanents ou à durée déterminée.
+squadmanager est l’entité IA dédiée au service direct du PDG, concevant, déployant et pilotant des équipes autonomes pour exécuter des projets stratégiques, permanents ou à durée déterminée.
 
 **Vision**  
 Offrir une agilité et une scalabilité maximales, mobilisant rapidement les compétences adaptées aux objectifs du PDG.
@@ -41,7 +41,7 @@ Offrir une agilité et une scalabilité maximales, mobilisant rapidement les com
 - **Clôture** : Livraison, archivage des résultats et dissolution éventuelle de la crew.
 
 **Rôles clés**  
-Tous les membres de la DreamTeam sont des IA, sauf le PDG qui est un humain.
+Tous les membres de la squadmanager sont des IA, sauf le PDG qui est un humain.
 - **Directeur Général (DG)** : Supervise globalement et rend compte au PDG.  
 - **Superviseur de Projet** : Coordonne tous les Chefs de Projet, sert de point de contact principal avec les équipes en charge des projets, et rend compte au DG.  
 - **Chef de Projet** : Gère ressources, délais et budgets, et rend compte au Superviseur.  
@@ -115,7 +115,7 @@ Les équipes opérationnelles rendent compte au Superviseur globalement et au Ch
 ### Mise à Jour
 - **Évaluation Continue** : Les modèles sont régulièrement mis à jour pour refléter les meilleures pratiques et les leçons apprises.
 
-## Rôles et Responsabilités de DreamTeam
+## Rôles et Responsabilités de squadmanager
 1. **Définir les Projets et Objectifs**
    - Créer des Projets : utiliser CrewAI pour définir chaque projet, ses objectifs, échéances et livrables.
    - Établir des Priorités : classer les projets par priorité pour guider le focus des équipes.
@@ -194,21 +194,21 @@ Les équipes opérationnelles rendent compte au Superviseur globalement et au Ch
 - **Communication Ouverte** : Réunions régulières et outils de communication pour alignement et information des équipes.
 
 ## Utilisation CLI
-Voici la liste des sous-commandes disponibles via `dreamteam` :
+Voici la liste des sous-commandes disponibles via `squadmanager` :
 
 ```bash
-dreamteam create_project <nom>                   # Créer un projet
-dreamteam create_team <nom>                     # Créer une équipe et son dossier
-dreamteam add_member_to_team <équipe> <membre>   # Ajouter un membre
-dreamteam assign_project_to_team <équipe> <projet> # Assigner un projet à une équipe
-dreamteam assign_project_to_all_teams <projet>    # Assigner un projet à toutes les équipes
-dreamteam set_cdc <projet> <chemin_fichier>        # Définir le CDC
-dreamteam get_cdc <projet>                        # Récupérer le CDC
-dreamteam transmit_cdc <projet>                   # Transmettre le CDC
-dreamteam run [--topic TOPIC] [--current_year YEAR] # Lancer la crewAI
-dreamteam train <n_iterations> <fichier> [--topic TOPIC] [--current_year YEAR] # Entraîner la crewAI
-dreamteam replay <task_id>                        # Rejouer une tâche
-dreamteam test <n_iterations> <eval_llm> [--topic TOPIC] [--current_year YEAR] # Tester la crewAI
+squadmanager create_project <nom>                   # Créer un projet
+squadmanager create_team <nom>                     # Créer une équipe et son dossier
+squadmanager add_member_to_team <équipe> <membre>   # Ajouter un membre
+squadmanager assign_project_to_team <équipe> <projet> # Assigner un projet à une équipe
+squadmanager assign_project_to_all_teams <projet>    # Assigner un projet à toutes les équipes
+squadmanager set_cdc <projet> <chemin_fichier>        # Définir le CDC
+squadmanager get_cdc <projet>                        # Récupérer le CDC
+squadmanager transmit_cdc <projet>                   # Transmettre le CDC
+squadmanager run [--topic TOPIC] [--current_year YEAR] # Lancer la crewAI
+squadmanager train <n_iterations> <fichier> [--topic TOPIC] [--current_year YEAR] # Entraîner la crewAI
+squadmanager replay <task_id>                        # Rejouer une tâche
+squadmanager test <n_iterations> <eval_llm> [--topic TOPIC] [--current_year YEAR] # Tester la crewAI
 
 ```
 
@@ -218,17 +218,17 @@ Pour garantir la fiabilité et la traçabilité des modifications automatiques v
 
 2. Commit initial et push systématique de l'état actuel du fichier concerné dans Git :
    ```powershell
-   git add .\src\dreamteam\<nom_du_fichier> && \
+   git add .\src\squadmanager\<nom_du_fichier> && \
    git commit -m "Backup initial: <nom_du_fichier>" && \
    git push
    ```
 
 3. Création systématique d'un backup local du fichier concerné :
    ```powershell
-   Copy-Item .\src\dreamteam\crew.py .\src\dreamteam\crew.py.bak
+   Copy-Item .\src\squadmanager\crew.py .\src\squadmanager\crew.py.bak
    ```
 
-4. Consolidation des imports CrewAI dans `src/dreamteam/crew.py` :
+4. Consolidation des imports CrewAI dans `src/squadmanager/crew.py` :
    ```python
    from crewai import Agent, Crew, Process, Task, CrewBase, agent, crew, task
    ```

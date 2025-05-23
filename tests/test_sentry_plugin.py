@@ -1,7 +1,7 @@
 import os
 import pytest
 import sentry_sdk
-from dreamteam.plugins.sentry_plugin import SentryPlugin
+from squadmanager.plugins.sentry_plugin import SentryPlugin
 
 class DummyException(Exception):
     pass

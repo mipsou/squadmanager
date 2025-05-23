@@ -3,24 +3,24 @@ import os
 import subprocess
 import sys
 from datetime import datetime
-from dreamteam.core import DreamTeam
-from dreamteam.flow import DreamteamFlow, DreamteamState
+from squadmanager.core import squadmanager
+from squadmanager.flow import squadmanagerFlow, squadmanagerState
 import json
 import sqlite3
-from dreamteam.memory import MemoryManager
-from dreamteam.memory_policy import MemoryPolicy
-from dreamteam.plugin_manager import PluginManager
+from squadmanager.memory import MemoryManager
+from squadmanager.memory_policy import MemoryPolicy
+from squadmanager.plugin_manager import PluginManager
 from importlib.metadata import version as _version, PackageNotFoundError
 import requests
 import webbrowser
 
 try:
-    __version__ = _version('dreamteam')
+    __version__ = _version('squadmanager')
 except PackageNotFoundError:
     __version__ = '0.0.0'
 
 def cli():
-    parser = argparse.ArgumentParser(prog="dreamteam")
+    parser = argparse.ArgumentParser(prog="squadmanager")
     parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
     subparsers = parser.add_subparsers(dest="command", required=True)
 
@@ -95,10 +95,10 @@ def cli():
     sd.add_argument("--plugin", required=True, help="Nom du plugin")
     sd.add_argument("--payload", required=True, help="Payload JSON de l'événement")
 
-    # Flow Dreamteam via CrewAI Flows
+    # Flow squadmanager via CrewAI Flows
     sp = subparsers.add_parser(
         "flow",
-        help="Lancer le flow Dreamteam via CrewAI Flows"
+        help="Lancer le flow squadmanager via CrewAI Flows"
     )
     sp.add_argument(
         "--topic",
@@ -116,12 +116,14 @@ def cli():
     sp = subparsers.add_parser(
         "test",
         aliases=["crewai_test"],
-        help="Lancer les tests intégrés de CrewAI après vérification des prérequis pytest"
+        help="Lancer pytest puis crewai test selon la documentation"
     )
+    sp.add_argument("year", nargs='?', type=int, default=None, help="Année pour crewai test (facultatif)")
+    sp.add_argument("n_iterations", nargs='?', type=int, default=None, help="Nb d'itérations pour crewai test (facultatif)")
     sp.add_argument(
         "--debug",
         action="store_true",
-        help="Activer mode debug pour la vérification de prérequis pytest"
+        help="Activer le mode debug pour pytest"
     )
 
     # KPI management commands
@@ -139,7 +141,7 @@ def cli():
     sp = subparsers.add_parser("list_kpis", help="List all KPIs")
 
     args = parser.parse_args()
-    team = DreamTeam()
+    team = squadmanager()
     if args.command == "create_project":
         print(team.create_project(args.name))
     elif args.command == "create_team":
@@ -242,25 +244,29 @@ def cli():
             plugin.send_event(payload)
             return
     elif args.command == "flow":
-        # Exécuter le flow Dreamteam
-        state = DreamteamState(topic=args.topic, year=args.year)
+        # Exécuter le flow squadmanager
+        state = squadmanagerState(topic=args.topic, year=args.year)
         try:
-            DreamteamFlow().run_flow(state)
+            squadmanagerFlow().run_flow(state)
         except Exception:
             sys.exit(1)
         return
     elif args.command in ("test", "crewai_test"):
-        # Exécuter pytest et crewai test si alias
+        # Exécuter pytest
         pytest_cmd = ["pytest", "-vv", "-s"] if args.debug else ["pytest", "-v", "--maxfail=1", "-s"]
         try:
             subprocess.run(pytest_cmd, check=True)
         except subprocess.CalledProcessError as e:
             sys.exit(e.returncode)
-        if args.command == "crewai_test":
-            try:
-                subprocess.run(["crewai", "test"], check=True)
-            except subprocess.CalledProcessError as e:
-                sys.exit(e.returncode)
+        # Construire la commande crewai test: avec ou sans paramètres
+        if args.year is not None and args.n_iterations is not None:
+            crewai_cmd = ["crewai", "test", str(args.year), str(args.n_iterations)]
+        else:
+            crewai_cmd = ["crewai", "test"]
+        try:
+            subprocess.run(crewai_cmd, check=True)
+        except subprocess.CalledProcessError as e:
+            sys.exit(e.returncode)
         return
     elif args.command == "define_kpi":
         team.define_kpi(args.name, args.description)

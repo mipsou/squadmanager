@@ -43,8 +43,8 @@ except ImportError:
 # https://docs.crewai.com/concepts/crews#example-crew-class-with-decorators
 
 @CrewBase
-class Dreamteam():
-    """Dreamteam crew"""
+class squadmanager():
+    """squadmanager crew"""
 
     # Stub pour détecter une nouvelle demande de projet
     def has_new_project_request(self) -> bool:
@@ -225,7 +225,7 @@ class Dreamteam():
 
     @crew
     def crew(self) -> Crew:
-        """Creates the Dreamteam crew"""
+        """Creates the squadmanager crew"""
         crew_kwargs = {
             "agents": self.agents,
             "tasks": self.tasks,

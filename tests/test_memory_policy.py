@@ -3,8 +3,8 @@ from datetime import datetime, timedelta
 import pytest
 from pathlib import Path
 
-from dreamteam.memory import MemoryManager
-from dreamteam.memory_policy import MemoryPolicy
+from squadmanager.memory import MemoryManager
+from squadmanager.memory_policy import MemoryPolicy
 
 
 def write_history(path, events):

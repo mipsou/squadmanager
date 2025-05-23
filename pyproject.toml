@@ -1,12 +1,13 @@
 [project]
 name = "squadmanager"
-version = "0.1.0"
-description = "DreamTeam manage all crewai team"
+version = "0.1.1"
+description = "squadmanager manage all crewai team"
 authors = [{ name = "Mipsou", email = "you@example.com" }]
 requires-python = ">=3.10,<3.14"
 dependencies = [
-    "crewai[tools]>=0.117.1,<1.0.0",
-    "appdirs>=2.0.0,<3.0.0",
+    "pydantic>=2.0,<3.0",
+    "crewai[tools,mcp]==0.11.2",
+    "appdirs>=1.4.4,<2.0.0",
     "sentry-sdk>=1.9.0,<2.0.0",
     "requests>=2.28.0,<3.0.0"
 ]
@@ -20,7 +21,7 @@ classifiers = [
 ]
 
 [project.scripts]
-dreamteam = "dreamteam.cli:cli"
+squadmanager = "squadmanager.cli:cli"
 
 [build-system]
 requires = ["hatchling"]
@@ -29,8 +30,8 @@ build-backend = "hatchling.build"
 [tool.crewai]
 type = "crew"
 
-[project.entry-points."dreamteam.plugins"]
+[project.entry-points."squadmanager.plugins"]
 # Plugins can register under this group
-example = "dreamteam.plugins.example_plugin:ExamplePlugin"
-sentry = "dreamteam.plugins.sentry_plugin:SentryPlugin"
-studio = "dreamteam.plugins.studio_plugin:StudioPlugin"
+example = "squadmanager.plugins.example_plugin:ExamplePlugin"
+sentry = "squadmanager.plugins.sentry_plugin:SentryPlugin"
+studio = "squadmanager.plugins.studio_plugin:StudioPlugin"

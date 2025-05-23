@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 
 class ExternalPlugin(ABC):
-    """Interface pour les plugins externes dreamteam"""
+    """Interface pour les plugins externes squadmanager"""
 
     def __init__(self, config: dict):
         self.config = config

@@ -4,11 +4,11 @@ from io import StringIO
 from contextlib import redirect_stdout
 import subprocess
 
-from dreamteam.cli import cli
+from squadmanager.cli import cli
 
 
 def run_cli(args):
-    sys.argv = ['dreamteam'] + args
+    sys.argv = ['squadmanager'] + args
     return cli()
 
 

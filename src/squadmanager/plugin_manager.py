@@ -1,6 +1,6 @@
 import importlib.metadata as _metadata
 from typing import Dict, Any
-from dreamteam.connectors import ExternalPlugin
+from squadmanager.connectors import ExternalPlugin
 
 
 class PluginManager:
@@ -12,12 +12,12 @@ class PluginManager:
         self.load_plugins()
 
     def load_plugins(self) -> None:
-        """Charge tous les plugins déclarés sous le groupe 'dreamteam.plugins'."""
+        """Charge tous les plugins déclarés sous le groupe 'squadmanager.plugins'."""
         try:
-            eps = _metadata.entry_points(group="dreamteam.plugins")
+            eps = _metadata.entry_points(group="squadmanager.plugins")
         except TypeError:
             # Pour compatibilité Python <3.10
-            eps = _metadata.entry_points().get("dreamteam.plugins", [])
+            eps = _metadata.entry_points().get("squadmanager.plugins", [])
         for ep in eps:
             plugin_cls = ep.load()
             plugin_config = self.config.get(ep.name, {})
