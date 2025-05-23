@@ -2,6 +2,7 @@ import argparse
 import os
 import subprocess
 import sys
+import time
 from datetime import datetime
 from squadmanager.core import squadmanager
 from squadmanager.flow import DreamteamFlow, DreamteamState
@@ -9,17 +10,48 @@ import json
 import sqlite3
 from squadmanager.memory import MemoryManager
 from squadmanager.memory_policy import MemoryPolicy
-from squadmanager.plugin_manager import PluginManager
 from importlib.metadata import version as _version, PackageNotFoundError
 import requests
 import webbrowser
+from pathlib import Path
+import yaml
+from squadmanager.plugin_manager import PluginManager
+from argparse import RawTextHelpFormatter
 
 try:
     __version__ = _version('squadmanager')
 except PackageNotFoundError:
     __version__ = '0.0.0'
 
+def auto_detect_studio_url(ports=None):
+    """Detecte localement un service CrewAI Studio sur localhost."""
+    ports = ports or [8000, 8080, 3000, 5000]
+    for port in ports:
+        try:
+            resp = requests.get(f"http://localhost:{port}/api/status", timeout=0.5)
+            if resp.ok:
+                return f"http://localhost:{port}"
+        except requests.RequestException:
+            pass
+    return None
+
 def cli():
+    # Charger config OS-spécifique pour les variables d'environnement
+    conf_files = ['.local.conf']
+    if os.name == 'nt':
+        conf_files = ['.windows.conf', '.win.conf'] + conf_files
+    for cf in conf_files:
+        p = Path(cf)
+        if p.is_file():
+            for ln in p.read_text().splitlines():
+                ln = ln.strip()
+                if not ln or ln.startswith('#'):
+                    continue
+                if '=' in ln:
+                    key, val = ln.split('=', 1)
+                    os.environ.setdefault(key.strip(), val.strip())
+            break
+
     parser = argparse.ArgumentParser(prog="squadmanager")
     parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -55,6 +87,19 @@ def cli():
     sp = subparsers.add_parser("transmit_cdc", help="Transmit CDC of project")
     sp.add_argument("project", help="Project name")
 
+    # Outils divers (mémoire)
+    tools_sp = subparsers.add_parser("tools", help="Gestion des outils divers")
+    tools_sub = tools_sp.add_subparsers(dest="tools_cmd", required=True)
+    tools_sub.add_parser("memory-show", help="Afficher l'historique de la mémoire")
+    mstats = tools_sub.add_parser("memory-stats", help="Afficher les statistiques de la mémoire")
+    mstats.add_argument("--ttl-days", type=int, help="TTL en jours")
+    mstats.add_argument("--max-events", type=int, help="Nombre max d'événements à conserver")
+    apply_p = tools_sub.add_parser("memory-apply-policy", help="Appliquer la politique de mémoire")
+    apply_p.add_argument("--ttl-days", type=int, help="TTL en jours")
+    apply_p.add_argument("--max-events", type=int, help="Nombre max d'événements à conserver")
+    reset_mem = tools_sub.add_parser("reset-memories", help="Reset CrewAI memory")
+    reset_mem.add_argument("--force", action="store_true", help="Confirmer la suppression sans invite")
+
     # CrewAI crew commands
     sp = subparsers.add_parser("run", help="Kickoff the crew")
     sp.add_argument("--topic", default="AI LLMs", help="Topic")
@@ -70,20 +115,57 @@ def cli():
     sp = subparsers.add_parser("replay", help="Replay the crew")
     sp.add_argument("task_id", help="Task ID")
 
-    sp = subparsers.add_parser("reset-memories", help="Reset CrewAI memory")
-    sp.add_argument("--force", action="store_true", help="Confirmer la suppression sans invite")
-
-    # Memory CLI commands
-    sp = subparsers.add_parser("memory-show", help="Afficher l'historique de la mémoire")
-    sp = subparsers.add_parser("memory-stats", help="Afficher les statistiques de la mémoire")
-    sp = subparsers.add_parser("memory-apply-policy", help="Appliquer la politique mémoire (TTL, max_events)")
-    sp.add_argument("--ttl-days", type=int, help="TTL en jours")
-    sp.add_argument("--max-events", type=int, help="Nombre max d'événements à conserver")
-
-    # CrewAI Studio commands
-    sp = subparsers.add_parser("studio", help="Gestion de CrewAI Studio")
+    # CrewAI Studio commands (YAML-based)
+    sp = subparsers.add_parser(
+        "studio",
+        help="Intégration CrewAI Studio",
+        description="Intégration CrewAI Studio",
+        formatter_class=RawTextHelpFormatter,
+        epilog='''Sub-commands:
+  list            Lister les crews
+  export <id>     Exporter le crew
+  import <file>   Importer le crew
+  list-agents     Lister les agents
+  export-agent <id> Exporter l'agent
+  import-agent <file> Importer l'agent
+  delete-crew <id> Supprimer le crew
+  delete-agent <id> Supprimer l'agent
+  list-tasks      Lister les tâches
+  export-task <id> Exporter la tâche
+  import-task <file> Importer la tâche'''
+    )
     sp.add_argument("--status", action="store_true", help="Vérifier la connexion à CrewAI Studio")
     sp.add_argument("--open", action="store_true", help="Ouvrir CrewAI Studio dans le navigateur")
+    studio_sp = sp.add_subparsers(
+        dest="studio_cmd",
+        required=False,
+        help="Sub-commands for CrewAI Studio",
+        title="studio subcommands",
+        description="Sous-commandes disponibles pour CrewAI Studio",
+        metavar="COMMAND"
+    )
+    studio_sp.add_parser("list", help="Lister les crews existants")
+    exp = studio_sp.add_parser("export", help="Exporter la config d'un crew depuis Studio")
+    exp.add_argument("crew_id", help="ID du crew à exporter")
+    exp.add_argument("-o", "--output", help="Fichier YAML de sortie (stdout sinon)", default=None)
+    imp = studio_sp.add_parser("import", help="Importer un crew dans Studio depuis YAML")
+    imp.add_argument("file", help="Fichier YAML du crew à importer")
+    studio_sp.add_parser("list-agents", help="Lister les agents existants")
+    exp_a = studio_sp.add_parser("export-agent", help="Exporter la config d'un agent depuis Studio")
+    exp_a.add_argument("agent_id", help="ID de l'agent à exporter")
+    exp_a.add_argument("-o", "--output", help="Fichier YAML de sortie (stdout sinon)", default=None)
+    imp_a = studio_sp.add_parser("import-agent", help="Importer un agent dans Studio depuis YAML")
+    imp_a.add_argument("file", help="Fichier YAML de l'agent à importer")
+    studio_sp.add_parser("list-tasks", help="Lister les tâches existantes")
+    exp_t = studio_sp.add_parser("export-task", help="Exporter la config d'une tâche depuis Studio")
+    exp_t.add_argument("task_id", help="ID de la tâche à exporter")
+    exp_t.add_argument("-o", "--output", help="Fichier YAML de sortie (stdout sinon)", default=None)
+    imp_t = studio_sp.add_parser("import-task", help="Importer une tâche dans Studio depuis YAML")
+    imp_t.add_argument("file", help="Fichier YAML de la tâche à importer")
+    delete_cr = studio_sp.add_parser("delete-crew", help="Supprimer un crew depuis Studio")
+    delete_cr.add_argument("crew_id", help="ID du crew à supprimer")
+    delete_ag = studio_sp.add_parser("delete-agent", help="Supprimer un agent depuis Studio")
+    delete_ag.add_argument("agent_id", help="ID de l'agent à supprimer")
 
     # Plugin commands
     sp = subparsers.add_parser("plugin", help="Gestion des plugins")
@@ -122,6 +204,11 @@ def cli():
         "--debug",
         action="store_true",
         help="Activer mode debug pour la vérification de prérequis pytest"
+    )
+    sp.add_argument(
+        "crew_name",
+        nargs="?",
+        help="Nom du crew à tester via crewai test",
     )
 
     # KPI management commands
@@ -177,60 +264,146 @@ def cli():
         subprocess.run(["crewai", "train", str(args.n_iterations), args.filename], check=True)
     elif args.command == "replay":
         subprocess.run(["crewai", "replay", args.task_id], check=True)
-    elif args.command == "reset-memories":
-        if not args.force:
-            answer = input("Attention : toutes les mémoires vont être supprimées. Confirmez (o/N) : ")
-            if answer.lower() not in ("o","oui","y","yes"):
-                print("Abandon de la réinitialisation des mémoires.")
-                sys.exit(0)
-        try:
-            subprocess.run(["crewai", "reset-memories"], check=True)
-        except subprocess.CalledProcessError as e:
-            sys.exit(e.returncode)
-        return
-    elif args.command == "memory-show":
-        mgr = MemoryManager()
-        for event in mgr.load_history():
-            print(json.dumps(event, ensure_ascii=False))
-        return
-    elif args.command == "memory-stats":
-        mgr = MemoryManager()
-        history = mgr.load_history()
-        print(f"Événements historiques: {len(history)}")
-        conn = sqlite3.connect(mgr.db_path)
-        cur = conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
-        tables = [r[0] for r in cur.fetchall()]
-        if tables:
-            print("Tables SQLite:")
-            for t in tables:
-                count = conn.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0]
-                print(f"  - {t}: {count}")
-        else:
-            print("Aucune table SQLite trouvée")
-        conn.close()
-        return
-    elif args.command == "memory-apply-policy":
-        # Applique la politique sur history.jsonl
-        # Permet d'utiliser CREWAI_STORAGE_DIR pour tests/env
-        mgr = MemoryManager()
-        policy = MemoryPolicy(ttl_days=args.ttl_days, max_events=args.max_events)
-        kept = policy.apply(mgr)
-        print(f"Événements conservés suite à la politique: {len(kept)}")
-        return
+    elif args.command == "tools":
+        if args.tools_cmd == "memory-show":
+            mgr = MemoryManager()
+            for event in mgr.load_history():
+                print(json.dumps(event, ensure_ascii=False))
+            return
+        if args.tools_cmd == "memory-stats":
+            mgr = MemoryManager()
+            history = mgr.load_history()
+            print(f"Événements historiques: {len(history)}")
+            conn = sqlite3.connect(mgr.db_path)
+            cur = conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
+            tables = [r[0] for r in cur.fetchall()]
+            if tables:
+                print("Tables SQLite:")
+                for t in tables:
+                    count = conn.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0]
+                    print(f"  - {t}: {count}")
+            else:
+                print("Aucune table SQLite trouvée")
+            conn.close()
+            return
+        if args.tools_cmd == "memory-apply-policy":
+            mgr = MemoryManager()
+            policy = MemoryPolicy(ttl_days=args.ttl_days, max_events=args.max_events)
+            kept = policy.apply(mgr)
+            print(f"Événements conservés suite à la politique: {len(kept)}")
+            return
+        if args.tools_cmd == "reset-memories":
+            if not args.force:
+                answer = input("Attention : toutes les mémoires vont être supprimées. Confirmez (o/N) : ")
+                if answer.lower() not in ("o","oui","y","yes"):
+                    print("Abandon de la réinitialisation des mémoires.")
+                    sys.exit(0)
+            try:
+                subprocess.run(["crewai", "reset-memories"], check=True)
+            except subprocess.CalledProcessError as e:
+                sys.exit(e.returncode)
+            return
     elif args.command == "studio":
-        # Status or open CrewAI Studio
-        url = os.getenv("CREWAI_STUDIO_URL", "https://studio.crewai.com")
-        headers = {}
-        token = os.getenv("CREWAI_STUDIO_API_KEY")
-        if token:
-            headers["Authorization"] = f"Bearer {token}"
+        # fallback import only on first run sans sous-commande/status/open
+        if args.studio_cmd is None and not args.status and not args.open:
+            init_file = Path.home() / '.squadmanager_initialized'
+            if not init_file.exists():
+                env_url = os.getenv('CREWAI_STUDIO_URL')
+                detected_url = auto_detect_studio_url()
+                # Lancer le studio local si aucun studio existant
+                if not detected_url and not env_url:
+                    studio_dir = Path('D:/Scripts/CrewAI-Studio/app')
+                    print('Aucun studio local détecté, lancement d\'une instance...')
+                    proc = subprocess.Popen(['streamlit','run','app.py','--server.port','8000'], cwd=str(studio_dir))
+                    for _ in range(10):
+                        time.sleep(1)
+                        detected_url = auto_detect_studio_url()
+                        if detected_url:
+                            break
+                    if detected_url:
+                        print(f'Studio local démarré sur {detected_url}')
+                    else:
+                        print('Erreur: impossible de démarrer le studio local')
+                target_url = env_url or detected_url or 'https://studio.crewai.com'
+                from squadmanager.plugins.studio_plugin import StudioPlugin
+                crew_cfg = yaml.safe_load(Path('squadmanagerAI.yml').read_text(encoding='utf-8'))
+                StudioPlugin({'url': target_url}).import_crew(crew_cfg)
+                print(f'Crew "squadmanagerAI" importé automatiquement sur {target_url}')
+                init_file.write_text(datetime.now().isoformat())
+        # Utilisation de StudioPlugin
+        env_url = os.getenv("CREWAI_STUDIO_URL")
+        url = env_url if env_url else auto_detect_studio_url()
+        if not url:
+            url = "https://studio.crewai.com"
+        api_key = os.getenv("CREWAI_STUDIO_API_KEY")
+        config = {"studio": {"url": url, "api_key": api_key}}
+        pm = PluginManager(config)
+        plugin = pm.get_plugin("studio")
+        if not plugin:
+            print("Plugin 'studio' non chargé")
+            sys.exit(1)
         if args.status:
-            resp = requests.get(f"{url}/api/status", headers=headers)
-            print(json.dumps(resp.json(), ensure_ascii=False))
+            print(json.dumps(plugin.health_check(), ensure_ascii=False))
             sys.exit(0)
         if args.open:
-            webbrowser.open(url)
+            plugin.open_ui()
             sys.exit(0)
+        if args.studio_cmd == "list":
+            print(yaml.safe_dump(plugin.list_crews(), allow_unicode=True, sort_keys=False))
+            return
+        if args.studio_cmd == "export":
+            crew = plugin.export_crew(args.crew_id)
+            out = yaml.safe_dump(crew, allow_unicode=True, sort_keys=False)
+            if args.output:
+                Path(args.output).write_text(out, encoding="utf-8")
+            else:
+                print(out)
+            return
+        if args.studio_cmd == "import":
+            crew_conf = yaml.safe_load(Path(args.file).read_text(encoding="utf-8"))
+            res = plugin.import_crew(crew_conf)
+            print(yaml.safe_dump(res, allow_unicode=True, sort_keys=False))
+            return
+        if args.studio_cmd == "list-agents":
+            print(yaml.safe_dump(plugin.list_agents(), allow_unicode=True, sort_keys=False))
+            return
+        if args.studio_cmd == "export-agent":
+            agent = plugin.export_agent(args.agent_id)
+            out = yaml.safe_dump(agent, allow_unicode=True, sort_keys=False)
+            if args.output:
+                Path(args.output).write_text(out, encoding="utf-8")
+            else:
+                print(out)
+            return
+        if args.studio_cmd == "import-agent":
+            agent_conf = yaml.safe_load(Path(args.file).read_text(encoding="utf-8"))
+            res = plugin.import_agent(agent_conf)
+            print(yaml.safe_dump(res, allow_unicode=True, sort_keys=False))
+            return
+        if args.studio_cmd == "list-tasks":
+            print(yaml.safe_dump(plugin.list_tasks(), allow_unicode=True, sort_keys=False))
+            return
+        if args.studio_cmd == "export-task":
+            task = plugin.export_task(args.task_id)
+            out = yaml.safe_dump(task, allow_unicode=True, sort_keys=False)
+            if args.output:
+                Path(args.output).write_text(out, encoding="utf-8")
+            else:
+                print(out)
+            return
+        if args.studio_cmd == "import-task":
+            task_conf = yaml.safe_load(Path(args.file).read_text(encoding="utf-8"))
+            res = plugin.import_task(task_conf)
+            print(yaml.safe_dump(res, allow_unicode=True, sort_keys=False))
+            return
+        if args.studio_cmd == "delete-crew":
+            res = plugin.delete_crew(args.crew_id)
+            print(yaml.safe_dump(res, allow_unicode=True, sort_keys=False))
+            return
+        if args.studio_cmd == "delete-agent":
+            res = plugin.delete_agent(args.agent_id)
+            print(yaml.safe_dump(res, allow_unicode=True, sort_keys=False))
+            return
         parser.print_help()
         sys.exit(1)
     elif args.command == "plugin":
@@ -243,7 +416,7 @@ def cli():
             plugin = pm.get_plugin(args.plugin)
             print(json.dumps(plugin.health_check(), ensure_ascii=False))
             return
-        if args.command and args.plugin_cmd == "send":
+        if args.plugin_cmd == "send":
             plugin = pm.get_plugin(args.plugin)
             payload = json.loads(args.payload)
             plugin.send_event(payload)
@@ -264,8 +437,12 @@ def cli():
         except subprocess.CalledProcessError as e:
             sys.exit(e.returncode)
         if args.command == "crewai_test":
+            # Appeler crewai test [crew_name]
+            cmd = ["crewai", "test"]
+            if args.crew_name:
+                cmd.append(args.crew_name)
             try:
-                subprocess.run(["crewai", "test"], check=True)
+                subprocess.run(cmd, check=True)
             except FileNotFoundError:
                 sys.exit("Erreur : CrewAI CLI introuvable. Installez-la via `pip install crewai`.")
             except subprocess.CalledProcessError as e:
