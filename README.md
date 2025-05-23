@@ -96,6 +96,14 @@ Pour configurer et lancer le **backend REST** de CrewAI Studio :
    squadmanager studio import path/to/squadmanagerAI.yml
    squadmanager studio list
    ```
+6. Ouvrir l'UI de CrewAI Studio :
+   ```bash
+  squadmanager studio --open
+   ```
+7. Lancer l'interface locale de CrewAI Studio :
+   ```bash
+  squadmanager studio serve
+   ```
 
 ## Running the Project
 
