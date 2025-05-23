@@ -1,5 +1,5 @@
-[![CI](https://img.shields.io/github/actions/workflow/status/mipsou/dreamteam/ci.yml?branch=main&style=flat-square&color=blue)](https://github.com/mipsou/dreamteam/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/mipsou/dreamteam?style=flat-square&color=brightgreen)](https://github.com/mipsou/dreamteam/releases)
+[![CI](https://img.shields.io/github/actions/workflow/status/mipsou/squadmanager/ci.yml?branch=main&style=flat-square&color=blue)](https://github.com/mipsou/squadmanager/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/mipsou/squadmanager?style=flat-square&color=brightgreen)](https://github.com/mipsou/squadmanager/releases)
 [![PyPI version](https://img.shields.io/pypi/v/squadmanager?style=flat-square&color=orange)](https://pypi.org/project/squadmanager/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue?style=flat-square)](https://opensource.org/licenses/Apache-2.0)
 [![Docs](https://img.shields.io/badge/docs-crewAI-blue?style=flat-square)](https://docs.crewai.com)
@@ -55,11 +55,11 @@ crewai install
 
 **Add your `OPENAI_API_KEY` into the `.env` file**
 
-- Modify `src/dreamteam/config/agents.yaml` to define your agents
-- Modify `src/dreamteam/config/tasks.yaml` to define your tasks
-- Modify `src/dreamteam/config/memory.yaml` to configure external memory (short_term, long_term, entity)
-- Modify `src/dreamteam/crew.py` to add your own logic, tools and specific args
-- Modify `src/dreamteam/main.py` to add custom inputs for your agents and tasks
+- Modify `src/squadmanager/config/agents.yaml` to define your agents
+- Modify `src/squadmanager/config/tasks.yaml` to define your tasks
+- Modify `src/squadmanager/config/memory.yaml` to configure external memory (short_term, long_term, entity)
+- Modify `src/squadmanager/crew.py` to add your own logic, tools and specific args
+- Modify `src/squadmanager/main.py` to add custom inputs for your agents and tasks
 
 ## Installation CrewAI Studio
 
@@ -94,25 +94,25 @@ Pour configurer et lancer le Studio :
 To kickstart your crew of AI agents and begin task execution, run this from the root folder of your project:
 
 ```bash
-dreamteam run [--once]
+squadmanager run [--once]
 ```
 
-This command initializes the DreamTeam Crew, assembling the agents and assigning them tasks as defined in your configuration.
+This command initializes the squadmanager Crew, assembling the agents and assigning them tasks as defined in your configuration.
 
 ## Running the Flow
 
-Pour exécuter le flow Dreamteam via CrewAI Flows, utilisez :
+Pour exécuter le flow squadmanager via CrewAI Flows, utilisez :
 
 ```bash
-dreamteam flow [--topic <topic>] [--year <year>]
+squadmanager flow [--topic <topic>] [--year <year>]
 ```
 
 ### Commandes mémoire
 
 ```bash
-dreamteam memory-show
-dreamteam memory-stats
-dreamteam memory-apply-policy [--ttl-days <jours>] [--max-events <nombre>]
+squadmanager memory-show
+squadmanager memory-stats
+squadmanager memory-apply-policy [--ttl-days <jours>] [--max-events <nombre>]
 ```
 
 - `memory-show` : Affiche l'historique des événements (JSONL).
@@ -123,13 +123,13 @@ dreamteam memory-apply-policy [--ttl-days <jours>] [--max-events <nombre>]
 Pour exécuter les tests unitaires et d'intégration, utilisez :
 
 ```bash
-dreamteam test
+squadmanager test
 ```
 
 Pour vérifier les prérequis puis lancer les tests CrewAI, utilisez :
 
 ```bash
-dreamteam crewai_test
+squadmanager crewai_test
 ```
 
 This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
@@ -150,7 +150,7 @@ Ce document couvre les sections suivantes :
 Pour plus de détails et guider votre implémentation, consultez directement la doc officielle.
 
 ## Configurer la mémoire externe
-Placez un fichier `config/memory.yaml` dans `src/dreamteam/` contenant :
+Placez un fichier `config/memory.yaml` dans `src/squadmanager/` contenant :
 ```yaml
 short_term_memory:
   storage:
@@ -176,9 +176,9 @@ entity_memory:
 ```
 Ensuite, instanciez votre crew :
 ```python
-from dreamteam.crew import Dreamteam
+from squadmanager.crew import squadmanager
 
-dt = Dreamteam(config_path='src/dreamteam/config')
+dt = squadmanager(config_path='src/squadmanager/config')
 crew = dt.crew()
 crew.kickoff()
 ```
@@ -211,14 +211,14 @@ Le cycle standard :
 
 ## Développement de plugins
 
-DreamTeam supporte un système de plugins via le groupe d’entry points `dreamteam.plugins`.
+squadmanager supporte un système de plugins via le groupe d’entry points `squadmanager.plugins`.
 
 Pour créer votre propre plugin :
 
-1. Créez un nouveau paquet Python (par exemple `dreamteam-plugin-monplugin`).
-2. Implémentez une classe héritant de `dreamteam.connectors.ExternalPlugin` :
+1. Créez un nouveau paquet Python (par exemple `squadmanager-plugin-monplugin`).
+2. Implémentez une classe héritant de `squadmanager.connectors.ExternalPlugin` :
 ```python
-from dreamteam.connectors import ExternalPlugin
+from squadmanager.connectors import ExternalPlugin
 
 class MonPlugin(ExternalPlugin):
     def health_check(self) -> dict:
@@ -233,16 +233,16 @@ class MonPlugin(ExternalPlugin):
 ```
 3. Dans le `pyproject.toml` de votre plugin, déclarez l’entry point :
 ```toml
-[project.entry-points."dreamteam.plugins"]
+[project.entry-points."squadmanager.plugins"]
 monplugin = "monpackage.module:MonPlugin"
 ```
 4. Publiez et installez votre plugin :
 ```bash
-pip install dreamteam-plugin-monplugin
+pip install squadmanager-plugin-monplugin
 ```
 5. Vérifiez la détection des plugins :
 ```python
-from dreamteam.plugin_manager import PluginManager
+from squadmanager.plugin_manager import PluginManager
 mgr = PluginManager()
 print(mgr.list_plugins())  # ex. ['example', 'monplugin']
 ```
@@ -252,11 +252,11 @@ print(mgr.list_plugins())  # ex. ['example', 'monplugin']
 
 ## Understanding Your Crew
 
-The DreamTeam Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
+The squadmanager Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
 
 ## Support
 
-For support, questions, or feedback regarding the Dreamteam Crew or crewAI.
+For support, questions, or feedback regarding the squadmanager Crew or crewAI.
 - Visit our [documentation](https://docs.crewai.com)
 - Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
 - [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
