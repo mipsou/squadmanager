@@ -1,7 +1,8 @@
-import sys
 import pytest
 import requests
 import webbrowser
+import subprocess
+import sys
 from squadmanager.cli import cli
 import yaml
 from pathlib import Path
@@ -106,3 +107,29 @@ def test_studio_import(mock_getenv, mock_post, capsys, tmp_path):
     captured = capsys.readouterr()
     result = yaml.safe_load(captured.out)
     assert result == {'status': 'ok'}
+
+def test_studio_serve_with_backend_dir(monkeypatch):
+    # Simule un backend dir via env
+    monkeypatch.setenv('CREWAI_STUDIO_BACKEND_DIR', '/my/backend')
+    calls = []
+    monkeypatch.setattr(subprocess, 'run', lambda args, cwd, check: calls.append((args, cwd)))
+    monkeypatch.setattr(sys, 'argv', ['squadmanager', 'studio', 'serve'])
+    with pytest.raises(SystemExit) as exc:
+        cli()
+    assert exc.value.code == 0
+    # Vérifie appel à streamlit via python -m
+    expected = [sys.executable, '-m', 'streamlit', 'run', 'app.py', '--server.port', '8501']
+    assert calls == [([sys.executable, '-m', 'streamlit', 'run', 'app.py', '--server.port', '8501'], '/my/backend')]
+
+def test_studio_serve_default_dir(monkeypatch):
+    # Pas de backend dir -> fallback
+    monkeypatch.delenv('CREWAI_STUDIO_BACKEND_DIR', raising=False)
+    calls = []
+    monkeypatch.setattr(subprocess, 'run', lambda args, cwd, check: calls.append((args, cwd)))
+    monkeypatch.setattr(sys, 'argv', ['squadmanager', 'studio', 'serve'])
+    with pytest.raises(SystemExit) as exc:
+        cli()
+    assert exc.value.code == 0
+    # Fallback devrait être 'D:/Scripts/CrewAI-Studio/app'
+    assert calls[0][1].endswith('D:/Scripts/CrewAI-Studio/app')
+    assert calls[0][0] == [sys.executable, '-m', 'streamlit', 'run', 'app.py', '--server.port', '8501']
