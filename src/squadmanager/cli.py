@@ -138,6 +138,13 @@ def cli():
 
     sp = subparsers.add_parser("list_kpis", help="List all KPIs")
 
+    # Export / Import commands for squadmanager data
+    sp = subparsers.add_parser("export", help="Export squadmanager data to JSON")
+    sp.add_argument("json_file", nargs="?", help="Output JSON file (defaults to stdout)")
+
+    sp = subparsers.add_parser("import", help="Import squadmanager data from JSON")
+    sp.add_argument("json_file", help="Input JSON file")
+
     args = parser.parse_args()
     team = squadmanager()
     if args.command == "create_project":
@@ -276,6 +283,22 @@ def cli():
         kpis = team.get_all_kpis()
         for n, info in kpis.items():
             print(f"{n}: {info['value']} -- {info['description']}")
+    elif args.command == "export":
+        mgr = squadmanager()
+        data = mgr.export_all()
+        if args.json_file:
+            with open(args.json_file, 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+        else:
+            print(json.dumps(data, ensure_ascii=False, indent=2))
+        return
+    elif args.command == "import":
+        mgr = squadmanager()
+        with open(args.json_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        mgr.import_all(data)
+        print("Data imported successfully")
+        return
     else:
         parser.print_help()
 
