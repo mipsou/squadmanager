@@ -20,6 +20,7 @@
 - **2025-05-17T19:51:30+02:00** : Monitoring & Observabilité (Sentry, Prometheus/Grafana, tests de charge, alertes CI)
 - **2025-05-17T21:15:20+02:00** : Plugin Dev Kit (example plugin, documentation, plugin manager)
 - **2025-05-24T16:52:45+02:00** : Bump de version 0.3.0, création de CHANGELOG et commit release
+- **2025-05-24T21:02:10+02:00** : Bump de version 0.4.0, implémentation `spec` & `demo`
 
 ## Tâches
 - [x] Audit Pydantic V1 vs V2 (PydanticAudit.md)
@@ -48,3 +49,20 @@
 - [ ] Mettre en place métriques Prometheus/Grafana
 - [ ] Rédiger tests de charge basiques
 - [ ] Définir alertes CI (coverage, performances)
+
+## Tâches v0.4.0
+- [x] Implémentation commande `spec` interactive et tests TDD
+- [x] Implémentation commande `demo` et tests TDD
+- [x] Ajout de `__main__.py` pour exécution en module
+- [x] Lock des dépendances (`requirements.txt`)
+- [x] Mise à jour CI (install via requirements.txt, lint, format, tests, build, smoke test)
+- [x] Mise à jour README (Installation, Usage, spec, demo)
+- [x] Création de la PR #22 sur GitHub
+- [x] Smoke test demo dans CI
+- [x] Exemples specs : ChatBot IA, Gestion Inventaire IA, Recommandation IA
+- [ ] Prototypage EventBus multi-agents IA
+- [ ] Tests flow asynchrone via EventBusMock
+- [ ] Plugin Prometheus
+- [ ] Intégration Sentry (logs/erreurs)
+- [ ] Tests de charge basiques
+- [ ] Alertes CI (coverage, performances)
