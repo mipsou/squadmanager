@@ -256,6 +256,10 @@ def cli():
     spec_sp.add_argument("--interactive", action="store_true", help="Mode interactif wizard")
     spec_sp.add_argument("file", nargs="?", help="Fichier texte du CDC")
 
+    # Démo privé : affiche le prototype structuré du CDC
+    demo_sp = subparsers.add_parser("demo", help="Démo privé de structuration de CDC")
+    demo_sp.add_argument("--template", help="Chemin vers le template markdown (optionnel)")
+
     args = parser.parse_args()
     team = squadmanager()
     if args.command == "create_project":
@@ -280,7 +284,7 @@ def cli():
     elif args.command == "memory-show":
         mgr = MemoryManager()
         for event in mgr.load_history():
-            print(json.dumps(event, ensure_ascii=False))
+            print(json.dumps(event, ensure_ascii=False), flush=True)
         return
     elif args.command == "memory-stats":
         mgr = MemoryManager()
@@ -334,7 +338,7 @@ def cli():
         if args.tools_cmd == "memory-show":
             mgr = MemoryManager()
             for event in mgr.load_history():
-                print(json.dumps(event, ensure_ascii=False))
+                print(json.dumps(event, ensure_ascii=False), flush=True)
             return
         if args.tools_cmd == "memory-stats":
             mgr = MemoryManager()
@@ -407,7 +411,7 @@ def cli():
             print("Plugin 'studio' non chargé")
             sys.exit(1)
         if args.status:
-            print(json.dumps(plugin.health_check(), ensure_ascii=False))
+            print(json.dumps(plugin.health_check(), ensure_ascii=False), flush=True)
             sys.exit(0)
         if args.open:
             plugin.open_ui()
@@ -506,7 +510,7 @@ def cli():
             return
         if args.plugin_cmd == "health":
             plugin = pm.get_plugin(args.plugin)
-            print(json.dumps(plugin.health_check(), ensure_ascii=False))
+            print(json.dumps(plugin.health_check(), ensure_ascii=False), flush=True)
             return
         if args.plugin_cmd == "send":
             plugin = pm.get_plugin(args.plugin)
@@ -559,7 +563,7 @@ def cli():
             with open(args.json_file, 'w', encoding='utf-8') as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
         else:
-            print(json.dumps(data, ensure_ascii=False, indent=2))
+            print(json.dumps(data, ensure_ascii=False, indent=2), flush=True)
         return
     elif args.command == "import":
         mgr = squadmanager()
@@ -583,18 +587,43 @@ def cli():
                         break
                     lines.append(inp)
                 answers[section] = "\n".join(lines)
-            print(json.dumps(answers, ensure_ascii=False))
+            print(json.dumps(answers, ensure_ascii=False), flush=True)
             sys.exit(0)
         elif args.file:
             text = Path(args.file).read_text(encoding="utf-8")
             data = parse_spec(text)
-            print(json.dumps(data, ensure_ascii=False))
+            print(json.dumps(data, ensure_ascii=False), flush=True)
             return
         else:
             print("Erreur : fichier requis ou --interactive")
             sys.exit(1)
-    else:
-        parser.print_help()
+    elif args.command == "demo":
+        # Choix du template
+        if args.template:
+            tpl = Path(args.template)
+        else:
+            # Template par défaut dans docs/spec_template.md à la racine du projet
+            tpl = Path(__file__).resolve().parents[2] / 'docs' / 'spec_template.md'
+        if not tpl.exists():
+            print(f"Erreur : template introuvable: {tpl}")
+            sys.exit(1)
+        text = tpl.read_text(encoding='utf-8')
+        data = parse_spec(text)
+        print(json.dumps(data, ensure_ascii=False), flush=True)
+        return data
+    # crew commands
+    elif args.command == "run":
+        # CLI wrapper : lancer crewai run
+        try:
+            cmd = ["crewai", "run"]
+            if args.docs:
+                # Calibrage: transformer en chemins absolus et trier pour ordre déterministe
+                docs_paths = sorted([Path(d).resolve().as_posix() for d in args.docs])
+                cmd += ["--docs"] + docs_paths
+            subprocess.run(cmd, check=True)
+        except subprocess.CalledProcessError as e:
+            sys.exit(e.returncode)
+        return
 
 if __name__ == "__main__":
     cli()

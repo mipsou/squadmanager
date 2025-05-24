@@ -19,6 +19,7 @@
 - **2025-05-17T19:46:02+02:00** : Release & maintenance (tests PyPI, CLI --version, tag v0.1.0)
 - **2025-05-17T19:51:30+02:00** : Monitoring & Observabilité (Sentry, Prometheus/Grafana, tests de charge, alertes CI)
 - **2025-05-17T21:15:20+02:00** : Plugin Dev Kit (example plugin, documentation, plugin manager)
+- **2025-05-24T16:52:45+02:00** : Bump de version 0.3.0, création de CHANGELOG et commit release
 
 ## Tâches
 - [x] Audit Pydantic V1 vs V2 (PydanticAudit.md)
