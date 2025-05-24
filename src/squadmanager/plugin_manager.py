@@ -21,7 +21,11 @@ class PluginManager:
         for ep in eps:
             plugin_cls = ep.load()
             plugin_config = self.config.get(ep.name, {})
-            plugin = plugin_cls(plugin_config)
+            try:
+                plugin = plugin_cls(plugin_config)
+            except Exception:
+                # Skip plugin if init fails (missing config)
+                continue
             self.plugins[ep.name] = plugin
 
     def list_plugins(self) -> list[str]:

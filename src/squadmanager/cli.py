@@ -4,6 +4,7 @@ import subprocess
 import sys
 import time
 from datetime import datetime
+from pathlib import Path
 from squadmanager.core import squadmanager
 from squadmanager.flow import DreamteamFlow, DreamteamState
 import json
@@ -13,10 +14,10 @@ from squadmanager.memory_policy import MemoryPolicy
 from importlib.metadata import version as _version, PackageNotFoundError
 import requests
 import webbrowser
-from pathlib import Path
 import yaml
 from squadmanager.plugin_manager import PluginManager
 from argparse import RawTextHelpFormatter
+from squadmanager.utils import parse_spec
 
 try:
     __version__ = _version('squadmanager')
@@ -25,7 +26,7 @@ except PackageNotFoundError:
 
 def auto_detect_studio_url(ports=None):
     """Detecte localement un service CrewAI Studio sur localhost."""
-    ports = ports or [8000, 8080, 3000, 5000]
+    ports = ports or [8000, 8080, 3000, 5000, 8501]
     for port in ports:
         try:
             resp = requests.get(f"http://localhost:{port}/api/status", timeout=0.5)
@@ -87,6 +88,17 @@ def cli():
     sp = subparsers.add_parser("transmit_cdc", help="Transmit CDC of project")
     sp.add_argument("project", help="Project name")
 
+    # Commandes mémoire en top-level pour tests TDD
+    mem_show_sp = subparsers.add_parser("memory-show", help="Afficher l'historique de la mémoire")
+    mem_stats_sp = subparsers.add_parser("memory-stats", help="Afficher les statistiques de la mémoire")
+    mem_stats_sp.add_argument("--ttl-days", type=int, help="TTL en jours")
+    mem_stats_sp.add_argument("--max-events", type=int, help="Nombre max d'événements à conserver")
+    mem_apply_sp = subparsers.add_parser("memory-apply-policy", help="Appliquer la politique de mémoire")
+    mem_apply_sp.add_argument("--ttl-days", type=int, help="TTL en jours")
+    mem_apply_sp.add_argument("--max-events", type=int, help="Nombre max d'événements à conserver")
+    reset_sp = subparsers.add_parser("reset-memories", help="Reset CrewAI memory")
+    reset_sp.add_argument("--force", action="store_true", help="Confirmer la suppression sans invite")
+
     # Outils divers (mémoire)
     tools_sp = subparsers.add_parser("tools", help="Gestion des outils divers")
     tools_sub = tools_sp.add_subparsers(dest="tools_cmd", required=True)
@@ -105,6 +117,7 @@ def cli():
     sp.add_argument("--topic", default="AI LLMs", help="Topic")
     sp.add_argument("--current_year", default=str(datetime.now().year), help="Year")
     sp.add_argument("--once", action="store_true", help="Lancer une seule itération puis quitter")
+    sp.add_argument("--docs", nargs="+", help="Chemins des documents du PDG", default=[])
 
     sp = subparsers.add_parser("train", help="Train the crew")
     sp.add_argument("n_iterations", type=int, help="Number of iterations")
@@ -238,6 +251,15 @@ def cli():
     sp = subparsers.add_parser("import", help="Import squadmanager data from JSON")
     sp.add_argument("json_file", help="Input JSON file")
 
+    # Structuration du cahier des charges (spec)
+    spec_sp = subparsers.add_parser("spec", help="Structurer un cahier des charges")
+    spec_sp.add_argument("--interactive", action="store_true", help="Mode interactif wizard")
+    spec_sp.add_argument("file", nargs="?", help="Fichier texte du CDC")
+
+    # Démo privé : affiche le prototype structuré du CDC
+    demo_sp = subparsers.add_parser("demo", help="Démo privé de structuration de CDC")
+    demo_sp.add_argument("--template", help="Chemin vers le template markdown (optionnel)")
+
     args = parser.parse_args()
     team = squadmanager()
     if args.command == "create_project":
@@ -258,11 +280,53 @@ def cli():
         print(team.get_cdc(args.project))
     elif args.command == "transmit_cdc":
         print(team.transmit_cdc(args.project))
+    # Traitement des commandes mémoire top-level
+    elif args.command == "memory-show":
+        mgr = MemoryManager()
+        for event in mgr.load_history():
+            print(json.dumps(event, ensure_ascii=False), flush=True)
+        return
+    elif args.command == "memory-stats":
+        mgr = MemoryManager()
+        history = mgr.load_history()
+        print(f"Événements historiques: {len(history)}")
+        conn = sqlite3.connect(mgr.db_path)
+        cur = conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        tables = [r[0] for r in cur.fetchall()]
+        if tables:
+            print("Tables SQLite:")
+            for t in tables:
+                count = conn.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0]
+                print(f"  - {t}: {count}")
+        conn.close()
+        return
+    elif args.command == "memory-apply-policy":
+        mgr = MemoryManager()
+        policy = MemoryPolicy(ttl_days=args.ttl_days, max_events=args.max_events)
+        kept = policy.apply(mgr)
+        print(f"Événements conservés suite à la politique: {len(kept)}")
+        return
+    elif args.command == "reset-memories":
+        if not args.force:
+            answer = input("Attention : toutes les mémoires vont être supprimées. Confirmez (o/N) : ")
+            if answer.lower() not in ("o","oui","y","yes"):
+                print("Abandon de la réinitialisation des mémoires.")
+                sys.exit(0)
+        try:
+            subprocess.run(["crewai", "reset-memories"], check=True)
+        except subprocess.CalledProcessError as e:
+            sys.exit(e.returncode)
+        return
     # crew commands
     elif args.command == "run":
         # CLI wrapper : lancer crewai run
         try:
-            subprocess.run(["crewai", "run"], check=True)
+            cmd = ["crewai", "run"]
+            if args.docs:
+                # Calibrage: transformer en chemins absolus et trier pour ordre déterministe
+                docs_paths = sorted([Path(d).resolve().as_posix() for d in args.docs])
+                cmd += ["--docs"] + docs_paths
+            subprocess.run(cmd, check=True)
         except subprocess.CalledProcessError as e:
             sys.exit(e.returncode)
         return
@@ -274,7 +338,7 @@ def cli():
         if args.tools_cmd == "memory-show":
             mgr = MemoryManager()
             for event in mgr.load_history():
-                print(json.dumps(event, ensure_ascii=False))
+                print(json.dumps(event, ensure_ascii=False), flush=True)
             return
         if args.tools_cmd == "memory-stats":
             mgr = MemoryManager()
@@ -288,8 +352,6 @@ def cli():
                 for t in tables:
                     count = conn.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0]
                     print(f"  - {t}: {count}")
-            else:
-                print("Aucune table SQLite trouvée")
             conn.close()
             return
         if args.tools_cmd == "memory-apply-policy":
@@ -349,7 +411,7 @@ def cli():
             print("Plugin 'studio' non chargé")
             sys.exit(1)
         if args.status:
-            print(json.dumps(plugin.health_check(), ensure_ascii=False))
+            print(json.dumps(plugin.health_check(), ensure_ascii=False), flush=True)
             sys.exit(0)
         if args.open:
             plugin.open_ui()
@@ -448,7 +510,7 @@ def cli():
             return
         if args.plugin_cmd == "health":
             plugin = pm.get_plugin(args.plugin)
-            print(json.dumps(plugin.health_check(), ensure_ascii=False))
+            print(json.dumps(plugin.health_check(), ensure_ascii=False), flush=True)
             return
         if args.plugin_cmd == "send":
             plugin = pm.get_plugin(args.plugin)
@@ -501,7 +563,7 @@ def cli():
             with open(args.json_file, 'w', encoding='utf-8') as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
         else:
-            print(json.dumps(data, ensure_ascii=False, indent=2))
+            print(json.dumps(data, ensure_ascii=False, indent=2), flush=True)
         return
     elif args.command == "import":
         mgr = squadmanager()
@@ -510,8 +572,58 @@ def cli():
         mgr.import_all(data)
         print("Data imported successfully")
         return
-    else:
-        parser.print_help()
+    elif args.command == "spec":
+        if args.interactive:
+            sections = ["Objectif", "Fonctionnalités", "Contraintes", "Livrables", "Données requises"]
+            answers = {}
+            print("Lancement du wizard interactif pour structurer le CDC")
+            for section in sections:
+                print(f"\n{section} :")
+                print("Entrez le contenu (finissez par une ligne vide) :")
+                lines = []
+                while True:
+                    inp = input()
+                    if not inp.strip():
+                        break
+                    lines.append(inp)
+                answers[section] = "\n".join(lines)
+            print(json.dumps(answers, ensure_ascii=False), flush=True)
+            sys.exit(0)
+        elif args.file:
+            text = Path(args.file).read_text(encoding="utf-8")
+            data = parse_spec(text)
+            print(json.dumps(data, ensure_ascii=False), flush=True)
+            return
+        else:
+            print("Erreur : fichier requis ou --interactive")
+            sys.exit(1)
+    elif args.command == "demo":
+        # Choix du template
+        if args.template:
+            tpl = Path(args.template)
+        else:
+            # Template par défaut dans docs/spec_template.md à la racine du projet
+            tpl = Path(__file__).resolve().parents[2] / 'docs' / 'spec_template.md'
+        if not tpl.exists():
+            print(f"Erreur : template introuvable: {tpl}")
+            sys.exit(1)
+        text = tpl.read_text(encoding='utf-8')
+        data = parse_spec(text)
+        print(json.dumps(data, ensure_ascii=False), flush=True)
+        return data
+    # crew commands
+    elif args.command == "run":
+        # CLI wrapper : lancer crewai run
+        try:
+            cmd = ["crewai", "run"]
+            if args.docs:
+                # Calibrage: transformer en chemins absolus et trier pour ordre déterministe
+                docs_paths = sorted([Path(d).resolve().as_posix() for d in args.docs])
+                cmd += ["--docs"] + docs_paths
+            subprocess.run(cmd, check=True)
+        except subprocess.CalledProcessError as e:
+            sys.exit(e.returncode)
+        return
 
 if __name__ == "__main__":
     cli()

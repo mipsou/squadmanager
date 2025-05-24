@@ -51,6 +51,14 @@ Next, navigate to your project directory and install the dependencies:
 uv install
 ```
 
+## Usage
+Pour afficher le prototype structuré du Cahier des Charges :
+```bash
+squadmanager demo
+# ou pour le développement
+python -m squadmanager.cli demo
+```
+
 ### Customizing
 
 **Add your `OPENAI_API_KEY` into the `.env` file**

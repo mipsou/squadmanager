@@ -1,11 +1,10 @@
 [project]
 name = "squadmanager"
-version = "0.2.0"
+version = "0.4.0"
 description = "squadmanager manage all crewai team"
 authors = [{ name = "Mipsou", email = "you@example.com" }]
 requires-python = ">=3.10,<3.14"
 dependencies = [
-    "crewai[tools]>=0.117.1,<1.0.0",
     "appdirs>=1.4.4,<2.0.0",
     "sentry-sdk>=1.9.0,<2.0.0",
     "requests>=2.28.0,<3.0.0"
@@ -28,6 +27,9 @@ build-backend = "hatchling.build"
 
 [tool.crewai]
 type = "crew"
+
+[project.optional-dependencies]
+tools = ["crewai[tools]>=0.117.1"]
 
 [project.entry-points."squadmanager.plugins"]
 # Plugins can register under this group
