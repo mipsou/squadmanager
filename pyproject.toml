@@ -1,6 +1,6 @@
 [project]
 name = "squadmanager"
-version = "0.3.0"
+version = "0.4.0"
 description = "squadmanager manage all crewai team"
 authors = [{ name = "Mipsou", email = "you@example.com" }]
 requires-python = ">=3.10,<3.14"
