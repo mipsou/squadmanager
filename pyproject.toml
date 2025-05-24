@@ -6,7 +6,7 @@ authors = [{ name = "Mipsou", email = "you@example.com" }]
 requires-python = ">=3.10,<3.14"
 dependencies = [
     "appdirs>=1.4.4,<2.0.0",
-    "sentry-sdk>=1.9.0,<2.0.0",
+    "sentry-sdk>=1.9.0,<3.0.0",
     "requests>=2.28.0,<3.0.0"
 ]
 readme = "README.md"
