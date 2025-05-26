@@ -83,3 +83,25 @@
 - [ ] Intégration Sentry (logs/erreurs)
 - [ ] Tests de charge basiques
 - [ ] Alertes CI (coverage, performances)
+
+## Branches Git
+
+La liste des branches locales et leur statut par rapport à `main` :
+
+| Branche                     | Dernier commit              | Statut           |
+|-----------------------------|-----------------------------|------------------|
+| ci-smoke-demo               | 2025-05-27 01:01:05 +0200   | non fusionnée    |
+| docs/add-serve-cmd          | 2025-05-24 00:35:30 +0200   | fusionnée        |
+| docs/add-stop-restart       | 2025-05-24 01:15:17 +0200   | fusionnée        |
+| export-import               | 2025-05-23 05:19:45 +0200   | fusionnée        |
+| feature/open-studio-ui      | 2025-05-23 23:50:08 +0200   | fusionnée        |
+| feature/open-ui-fallback    | 2025-05-24 00:05:44 +0200   | fusionnée        |
+| feature/restart-command     | 2025-05-24 00:59:50 +0200   | fusionnée        |
+| feature/serve-command       | 2025-05-24 00:29:57 +0200   | fusionnée        |
+| feature/stop-command        | 2025-05-24 00:52:13 +0200   | fusionnée        |
+| feature/studio-backend-rest | 2025-05-23 23:08:25 +0200   | fusionnée        |
+| fix/ci-release              | 2025-05-23 04:58:08 +0200   | fusionnée        |
+| main                        | 2025-05-24 21:38:18 +0200   | branche principale |
+| release/v0.2.0              | 2025-05-24 17:38:07 +0200   | fusionnée        |
+| rename-squadmanager         | 2025-05-24 21:38:18 +0200   | fusionnée        |
+| test/utils-auto-detect      | 2025-05-24 01:09:48 +0200   | fusionnée        |
