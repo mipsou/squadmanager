@@ -1,0 +1,7 @@
+2025-05-26 20:40:20,428 INFO Élévation des privilèges via UAC
+2025-05-26 20:40:22,981 INFO Élévation des privilèges via UAC
+2025-05-26 20:40:22,994 INFO Suppression des processus verrouillant
+2025-05-26 20:40:22,994 INFO Tentative de suppression des processus: ['squadmanager.exe', 'uv.exe', 'uvicorn.exe']
+2025-05-26 20:40:23,044 INFO Réinstallation du projet en mode editable
+2025-05-26 20:40:29,099 INFO Lancement de squadmanager run --once
+2025-05-26 20:40:48,582 INFO Bootstrap terminé. Consultez le log ici : D:\Scripts\squadmanager\bootstrap.log

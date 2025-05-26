@@ -1,4 +1,3 @@
-from datetime import datetime
 from datetime import datetime as dt
 from pydantic import BaseModel
 from squadmanager.crew import squadmanager
@@ -12,14 +11,6 @@ class Flow:
 def start(fn):
     """Stub decorator start"""
     return fn
-
-# Optionnel: override stub si module Flow réel disponible
-try:
-    from crewai.flow.flow import Flow as _RealFlow, start as _RealStart
-    Flow, start = _RealFlow, _RealStart
-except Exception:
-    pass
-
 
 class DreamteamState(BaseModel):
     topic: str = "AI LLMs"
