@@ -33,14 +33,16 @@ Perfect for quickly deploying scalable, high-performance AI applications.
 - 💖 [Contributing](#contributing)
 - 📄 [License](#license)
 - 📞 [Contact](#contact)
+- 🚨 [Dépannage](#dépannage)
 
 ## Installation
 
 Ensure you have Python >=3.10 <3.13 installed on your system. This project uses [UV](https://docs.astral.sh/uv/) for dependency management and package handling, offering a seamless setup and execution experience.
 
-First, if you haven't already, install uv:
+First, if you haven't already, install the extras tools of CrewAI and then uv:
 
 ```bash
+pip install "crewai[tools]>=0.11.2,<0.12.0"
 pip install uv
 ```
 
@@ -240,6 +242,34 @@ Le cycle standard :
 9. Amélioration continue  
    - **DG IA** restructure l’organisation ou déclenche une nouvelle itération  
    - **Documentaliste IA** trace chaque évolution
+
+## Dépannage
+
+En cas de problème avec le bootstrap ou le lancement de la CLI :
+
+1. Lire les derniers logs :
+   ```powershell
+   Get-Content .\bootstrap.log -Tail 100
+   ```
+2. Fermer/terminer manuellement les processus bloquants :
+   ```powershell
+   Get-Process squadmanager, uv, uvicorn -ErrorAction SilentlyContinue | Stop-Process -Force
+   ```
+3. Réinstaller le projet en editable :
+   ```powershell
+   .\.venv\Scripts\Activate.ps1
+   pip install -e .
+   ```
+4. Relancer la CLI :
+   ```powershell
+   squadmanager run --once
+   ```
+5. En fallback, utiliser `unlock_module.py` :
+   ```powershell
+   python unlock_module.py
+   squadmanager run --once
+   ```
+6. Ajouter un test TDD `tests/test_bootstrap.py` pour valider que `python bootstrap_run.py` renvoie `exit code 0`.
 
 ## Développement de plugins
 

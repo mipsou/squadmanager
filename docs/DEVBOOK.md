@@ -21,6 +21,23 @@
 - **2025-05-17T21:15:20+02:00** : Plugin Dev Kit (example plugin, documentation, plugin manager)
 - **2025-05-24T16:52:45+02:00** : Bump de version 0.3.0, création de CHANGELOG et commit release
 - **2025-05-24T21:02:10+02:00** : Bump de version 0.4.0, implémentation `spec` & `demo`
+- **2025-05-26T13:09:12+02:00** : Ajout du test TDD `tests/test_env.py` et rétablissement de l’appel externe `crewai run` dans le CLI.
+- **2025-05-26T20:03:52+02:00** : Ajout du déverrouillage Windows automatique avant `crewai run` et mise à jour de la doc d’installation (`crewai[tools]`).
+
+## Procédure de secours (bootstrap HS)
+- Lire le log avec `Get-Content .\bootstrap.log -Tail 100` pour identifier l’étape en erreur.
+- Ré-exécuter manuellement les commandes en PowerShell admin :
+  1. `Get-Process squadmanager, uv, uvicorn -ErrorAction SilentlyContinue | Stop-Process -Force`
+  2. `.\.venv\Scripts\Activate.ps1`
+  3. `pip install -e .`
+  4. `squadmanager run --once`
+- Utiliser le script de fallback `unlock_module.py` si nécessaire :
+  ```powershell
+  python unlock_module.py
+  squadmanager run --once
+  ```
+- Créer un test TDD `tests/test_bootstrap.py` pour valider `exit code == 0`.
+- Documenter et valider cette procédure en revue de code.
 
 ## Tâches
 - [x] Audit Pydantic V1 vs V2 (PydanticAudit.md)
