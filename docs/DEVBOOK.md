@@ -90,9 +90,6 @@ La liste des branches locales et leur statut par rapport à `main` :
 
 | Branche                     | Dernier commit              | Statut           |
 |-----------------------------|-----------------------------|------------------|
-| ci-smoke-demo               | 2025-05-27 01:01:05 +0200   | non fusionnée    |
-| docs/add-serve-cmd          | 2025-05-24 00:35:30 +0200   | fusionnée        |
-| docs/add-stop-restart       | 2025-05-24 01:15:17 +0200   | fusionnée        |
 | export-import               | 2025-05-23 05:19:45 +0200   | fusionnée        |
 | feature/open-studio-ui      | 2025-05-23 23:50:08 +0200   | fusionnée        |
 | feature/open-ui-fallback    | 2025-05-24 00:05:44 +0200   | fusionnée        |
@@ -105,3 +102,13 @@ La liste des branches locales et leur statut par rapport à `main` :
 | release/v0.2.0              | 2025-05-24 17:38:07 +0200   | fusionnée        |
 | rename-squadmanager         | 2025-05-24 21:38:18 +0200   | fusionnée        |
 | test/utils-auto-detect      | 2025-05-24 01:09:48 +0200   | fusionnée        |
+
+### Workflow Git
+
+- **Main** : branche stable, protégée et toujours à jour.
+- **Branches éphémères** : préfixées par `feature/`, `fix/`, `chore/`, avec une durée de vie courte.
+- **Nettoyage régulier** :
+  - `git fetch --prune`
+  - `git branch -d <branche_locale>`
+  - `git push origin --delete <branche_distante>`
+- **Principe KISS** : fusionner et supprimer rapidement les branches terminées pour garder le dépôt clair.
