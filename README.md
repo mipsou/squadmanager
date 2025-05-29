@@ -32,6 +32,7 @@ Perfect for quickly deploying scalable, high-performance AI applications.
 - 🧪 [Testing](#testing)
 - 💖 [Contributing](#contributing)
 - 📄 [License](#license)
+- 📋 [Gestion de projet](#gestion-de-projet)
 - 📞 [Contact](#contact)
 - 🚨 [Dépannage](#dépannage)
 
@@ -316,16 +317,13 @@ print(mgr.list_plugins())  # ex. ['example', 'monplugin']
 
 The squadmanager Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
 
-## Support
+## Gestion de projet
 
-For support, questions, or feedback regarding the squadmanager Crew or crewAI.
-- Visit our [documentation](https://docs.crewai.com)
-- Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
-- [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
-- [Guide d’installation officiel](https://docs.crewai.com/installation)
-- [Chat GPT dédié CrewAI](https://chat.g.pt/DWjSBZn)
-
-Let's create wonders together with the power and simplicity of crewAI.
+Organisez et suivez l’avancement avec **GitHub Projects** :
+- Board principal : https://github.com/mipsou/squadmanager/projects
+- Colonnes : *Backlog*, *In Progress*, *Done*
+- Liez issues/PRs aux cartes, utilisez *labels* et *milestones*
+- Mettez à jour le board régulièrement pour garantir la visibilité
 
 ## Contact
 Pour toute question, voir [mon profil GitHub](https://github.com/mipsou).
