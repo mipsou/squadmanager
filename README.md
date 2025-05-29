@@ -320,7 +320,7 @@ The squadmanager Crew is composed of multiple AI agents, each with unique roles,
 ## Gestion de projet
 
 Organisez et suivez l’avancement avec **GitHub Projects** :
-- Board principal : https://github.com/mipsou/squadmanager/projects
+- Board principal : https://github.com/mipsou/squadmanager/projects?query=is%3Aopen
 - Colonnes : *Backlog*, *In Progress*, *Done*
 - Liez issues/PRs aux cartes, utilisez *labels* et *milestones*
 - Mettez à jour le board régulièrement pour garantir la visibilité
