@@ -1,6 +1,6 @@
-import yaml
 import pytest
 from pathlib import Path
+import yaml
 from squadmanager.crew import squadmanager
 
 def test_agent_methods_exist():

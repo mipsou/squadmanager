@@ -20,6 +20,7 @@ classifiers = [
 
 [project.scripts]
 squadmanager = "squadmanager.cli:cli"
+run_crew = "crewai.cli.run_crew:run_crew"
 
 [build-system]
 requires = ["hatchling"]
@@ -29,7 +30,7 @@ build-backend = "hatchling.build"
 type = "crew"
 
 [project.optional-dependencies]
-tools = ["crewai[tools]>=0.117.1"]
+tools = ["crewai[tools]>=0.11.2,<0.12.0"]
 
 [project.entry-points."squadmanager.plugins"]
 # Plugins can register under this group

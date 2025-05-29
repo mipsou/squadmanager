@@ -21,6 +21,23 @@
 - **2025-05-17T21:15:20+02:00** : Plugin Dev Kit (example plugin, documentation, plugin manager)
 - **2025-05-24T16:52:45+02:00** : Bump de version 0.3.0, création de CHANGELOG et commit release
 - **2025-05-24T21:02:10+02:00** : Bump de version 0.4.0, implémentation `spec` & `demo`
+- **2025-05-26T13:09:12+02:00** : Ajout du test TDD `tests/test_env.py` et rétablissement de l’appel externe `crewai run` dans le CLI.
+- **2025-05-26T20:03:52+02:00** : Ajout du déverrouillage Windows automatique avant `crewai run` et mise à jour de la doc d’installation (`crewai[tools]`).
+
+## Procédure de secours (bootstrap HS)
+- Lire le log avec `Get-Content .\bootstrap.log -Tail 100` pour identifier l’étape en erreur.
+- Ré-exécuter manuellement les commandes en PowerShell admin :
+  1. `Get-Process squadmanager, uv, uvicorn -ErrorAction SilentlyContinue | Stop-Process -Force`
+  2. `.\.venv\Scripts\Activate.ps1`
+  3. `pip install -e .`
+  4. `squadmanager run --once`
+- Utiliser le script de fallback `unlock_module.py` si nécessaire :
+  ```powershell
+  python unlock_module.py
+  squadmanager run --once
+  ```
+- Créer un test TDD `tests/test_bootstrap.py` pour valider `exit code == 0`.
+- Documenter et valider cette procédure en revue de code.
 
 ## Tâches
 - [x] Audit Pydantic V1 vs V2 (PydanticAudit.md)
@@ -66,3 +83,32 @@
 - [ ] Intégration Sentry (logs/erreurs)
 - [ ] Tests de charge basiques
 - [ ] Alertes CI (coverage, performances)
+
+## Branches Git
+
+La liste des branches locales et leur statut par rapport à `main` :
+
+| Branche                     | Dernier commit              | Statut           |
+|-----------------------------|-----------------------------|------------------|
+| export-import               | 2025-05-23 05:19:45 +0200   | fusionnée        |
+| feature/open-studio-ui      | 2025-05-23 23:50:08 +0200   | fusionnée        |
+| feature/open-ui-fallback    | 2025-05-24 00:05:44 +0200   | fusionnée        |
+| feature/restart-command     | 2025-05-24 00:59:50 +0200   | fusionnée        |
+| feature/serve-command       | 2025-05-24 00:29:57 +0200   | fusionnée        |
+| feature/stop-command        | 2025-05-24 00:52:13 +0200   | fusionnée        |
+| feature/studio-backend-rest | 2025-05-23 23:08:25 +0200   | fusionnée        |
+| fix/ci-release              | 2025-05-23 04:58:08 +0200   | fusionnée        |
+| main                        | 2025-05-24 21:38:18 +0200   | branche principale |
+| release/v0.2.0              | 2025-05-24 17:38:07 +0200   | fusionnée        |
+| rename-squadmanager         | 2025-05-24 21:38:18 +0200   | fusionnée        |
+| test/utils-auto-detect      | 2025-05-24 01:09:48 +0200   | fusionnée        |
+
+### Workflow Git
+
+- **Main** : branche stable, protégée et toujours à jour.
+- **Branches éphémères** : préfixées par `feature/`, `fix/`, `chore/`, avec une durée de vie courte.
+- **Nettoyage régulier** :
+  - `git fetch --prune`
+  - `git branch -d <branche_locale>`
+  - `git push origin --delete <branche_distante>`
+- **Principe KISS** : fusionner et supprimer rapidement les branches terminées pour garder le dépôt clair.

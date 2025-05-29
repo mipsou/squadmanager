@@ -18,6 +18,13 @@ import yaml
 from squadmanager.plugin_manager import PluginManager
 from argparse import RawTextHelpFormatter
 from squadmanager.utils import parse_spec
+import platform
+try:
+    import psutil
+    from elevate import elevate
+except ImportError:
+    psutil = None
+    elevate = None
 
 try:
     __version__ = _version('squadmanager')
@@ -88,6 +95,15 @@ def cli():
     sp = subparsers.add_parser("transmit_cdc", help="Transmit CDC of project")
     sp.add_argument("project", help="Project name")
 
+    # Structuration du CDC
+    sp = subparsers.add_parser("spec", help="Structurer le CDC (wizard ou fichier)")
+    sp.add_argument("--interactive", action="store_true", help="Mode interactif")
+    sp.add_argument("file", nargs="?", help="Chemin vers le fichier de spécification")
+
+    # Démo du CDC
+    sp = subparsers.add_parser("demo", help="Afficher un exemple de CDC depuis un template")
+    sp.add_argument("--template", help="Chemin vers le template de spécification")
+
     # Commandes mémoire en top-level pour tests TDD
     mem_show_sp = subparsers.add_parser("memory-show", help="Afficher l'historique de la mémoire")
     mem_stats_sp = subparsers.add_parser("memory-stats", help="Afficher les statistiques de la mémoire")
@@ -114,6 +130,7 @@ def cli():
 
     # CrewAI crew commands
     sp = subparsers.add_parser("run", help="Kickoff the crew")
+    sp.add_argument("--crew-name", default="squadmanagerAI", help="Nom du crew à activer")
     sp.add_argument("--topic", default="AI LLMs", help="Topic")
     sp.add_argument("--current_year", default=str(datetime.now().year), help="Year")
     sp.add_argument("--once", action="store_true", help="Lancer une seule itération puis quitter")
@@ -251,15 +268,6 @@ def cli():
     sp = subparsers.add_parser("import", help="Import squadmanager data from JSON")
     sp.add_argument("json_file", help="Input JSON file")
 
-    # Structuration du cahier des charges (spec)
-    spec_sp = subparsers.add_parser("spec", help="Structurer un cahier des charges")
-    spec_sp.add_argument("--interactive", action="store_true", help="Mode interactif wizard")
-    spec_sp.add_argument("file", nargs="?", help="Fichier texte du CDC")
-
-    # Démo privé : affiche le prototype structuré du CDC
-    demo_sp = subparsers.add_parser("demo", help="Démo privé de structuration de CDC")
-    demo_sp.add_argument("--template", help="Chemin vers le template markdown (optionnel)")
-
     args = parser.parse_args()
     team = squadmanager()
     if args.command == "create_project":
@@ -319,13 +327,28 @@ def cli():
         return
     # crew commands
     elif args.command == "run":
-        # CLI wrapper : lancer crewai run
+        # CLI wrapper : lancer crewai run avec libération du module sous Windows
+        if platform.system() == "Windows" and psutil:
+            if elevate:
+                try:
+                    elevate()
+                except SystemExit:
+                    pass
+            target = os.path.join(sys.prefix, "Lib", "site-packages", "charset_normalizer", "md.cp311-win_amd64.pyd")
+            for proc in psutil.process_iter(["pid", "name"]):
+                try:
+                    for m in proc.memory_maps():
+                        if target.lower() in m.path.lower():
+                            proc.terminate()
+                except (psutil.NoSuchProcess, psutil.AccessDenied):
+                    continue
+        # Construire la commande crewai run avec docs si fournis
+        cmd = ["crewai", "run"]
+        if args.docs:
+            docs = [Path(d).resolve().as_posix() for d in args.docs]
+            docs.sort()
+            cmd += ["--docs"] + docs
         try:
-            cmd = ["crewai", "run"]
-            if args.docs:
-                # Calibrage: transformer en chemins absolus et trier pour ordre déterministe
-                docs_paths = sorted([Path(d).resolve().as_posix() for d in args.docs])
-                cmd += ["--docs"] + docs_paths
             subprocess.run(cmd, check=True)
         except subprocess.CalledProcessError as e:
             sys.exit(e.returncode)
@@ -613,16 +636,9 @@ def cli():
         return data
     # crew commands
     elif args.command == "run":
-        # CLI wrapper : lancer crewai run
-        try:
-            cmd = ["crewai", "run"]
-            if args.docs:
-                # Calibrage: transformer en chemins absolus et trier pour ordre déterministe
-                docs_paths = sorted([Path(d).resolve().as_posix() for d in args.docs])
-                cmd += ["--docs"] + docs_paths
-            subprocess.run(cmd, check=True)
-        except subprocess.CalledProcessError as e:
-            sys.exit(e.returncode)
+        # Exécution locale du Flow Dreamteam sans CLI externe
+        state = DreamteamState(topic=args.topic, year=int(args.current_year))
+        DreamteamFlow().run_flow(state)
         return
 
 if __name__ == "__main__":

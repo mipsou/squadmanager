@@ -13,24 +13,18 @@ except ImportError:
 import crewai
 from crewai import Agent, Crew, Process, Task
 
+# Stubs pour wrapper CrewAI
+CrewBase = lambda cls: cls
+agent = lambda fn: fn
+crew = lambda fn: fn
+task = lambda fn: fn
+
 # Lifecycle decorators
 try:
     from crewai import before_kickoff, after_kickoff
 except ImportError:
     def before_kickoff(fn): return fn
     def after_kickoff(fn): return fn
-
-# CrewBase and task decorators
-try:
-    from crewai.project import CrewBase, agent, crew, task
-except ImportError:
-    CrewBase = getattr(crewai, 'CrewBase', lambda cls: cls)
-    _local_agent = getattr(crewai, 'agent', None)
-    agent = _local_agent if callable(_local_agent) else (lambda fn: fn)
-    _local_crew = getattr(crewai, 'crew', None)
-    crew = _local_crew if callable(_local_crew) else (lambda fn: fn)
-    _local_task = getattr(crewai, 'task', None)
-    task = _local_task if callable(_local_task) else (lambda fn: fn)
 
 # BaseAgent fallback
 try:
@@ -106,124 +100,72 @@ class squadmanager():
             else:
                 warnings.warn(f"Méthode de tâche '{name}' non implémentée, ignorée.")
 
-    # Learn more about YAML configuration files here:
-    # Agents: https://docs.crewai.com/concepts/agents#yaml-configuration-recommended
-    # Tasks: https://docs.crewai.com/concepts/tasks#yaml-configuration-recommended
-    
-    # If you would like to add tools to your agents, you can learn more about it here:
-    # https://docs.crewai.com/concepts/agents#agent-tools
-    # Agents defined in config
+    # Méthodes agents définies manuellement
     @agent
-    def superviseur(self) -> Agent:
-        cfg = self.agents_config['superviseur']
+    def dg_ia(self) -> Agent:
+        cfg = self.agents_config['dg_ia']
         return Agent(**cfg, verbose=True)
-
+    @agent
+    def cabinet_rh(self) -> Agent:
+        cfg = self.agents_config['cabinet_rh']
+        return Agent(**cfg, verbose=True)
+    @agent
+    def architecte_ia(self) -> Agent:
+        cfg = self.agents_config['architecte_ia']
+        return Agent(**cfg, verbose=True)
+    @agent
+    def juriste_ia(self) -> Agent:
+        cfg = self.agents_config['juriste_ia']
+        return Agent(**cfg, verbose=True)
+    @agent
+    def analyste_ia(self) -> Agent:
+        cfg = self.agents_config['analyste_ia']
+        return Agent(**cfg, verbose=True)
+    @agent
+    def documentaliste_ia(self) -> Agent:
+        cfg = self.agents_config['documentaliste_ia']
+        return Agent(**cfg, verbose=True)
+    @agent
+    def conseil_ia(self) -> Agent:
+        cfg = self.agents_config['conseil_ia']
+        return Agent(**cfg, verbose=True)
     @agent
     def chef_de_projet(self) -> Agent:
         cfg = self.agents_config['chef_de_projet']
         return Agent(**cfg, verbose=True)
 
-    @agent
-    def prompteur(self) -> Agent:
-        cfg = self.agents_config['prompteur']
-        return Agent(**cfg, verbose=True)
-
-    @agent
-    def qa(self) -> Agent:
-        cfg = self.agents_config['qa']
-        return Agent(**cfg, verbose=True)
-
-    @agent
-    def analyste(self) -> Agent:
-        cfg = self.agents_config['analyste']
-        return Agent(**cfg, verbose=True)
-
-    @agent
-    def documentaliste(self) -> Agent:
-        cfg = self.agents_config['documentaliste']
-        return Agent(**cfg, verbose=True)
-
-    @agent
-    def directeur_general(self) -> Agent:
-        cfg = self.agents_config['directeur_general']
-        return Agent(**cfg, verbose=True)
-
-    @agent
-    def architecte_ia(self) -> Agent:
-        cfg = self.agents_config['architecte_ia']
-        return Agent(**cfg, verbose=True)
-
-    @agent
-    def juriste_ia(self) -> Agent:
-        cfg = self.agents_config['juriste_ia']
-        return Agent(**cfg, verbose=True)
-
-    @agent
-    def conseil_ia(self) -> Agent:
-        cfg = self.agents_config['conseil_ia']
-        return Agent(**cfg, verbose=True)
-
-    @agent
-    def dg_ia(self) -> Agent:
-        cfg = self.agents_config['dg_ia']
-        return Agent(**cfg, verbose=True)
-
-    @agent
-    def cabinet_rh(self) -> Agent:
-        cfg = self.agents_config['cabinet_rh']
-        return Agent(**cfg, verbose=True)
-
-    @agent
-    def analyste_ia(self) -> Agent:
-        cfg = self.agents_config['analyste_ia']
-        return Agent(**cfg, verbose=True)
-
-    @agent
-    def documentaliste_ia(self) -> Agent:
-        cfg = self.agents_config['documentaliste_ia']
-        return Agent(**cfg, verbose=True)
-
-    # To learn more about structured task outputs,
-    # task dependencies, and task callbacks, check out the documentation:
-    # https://docs.crewai.com/concepts/tasks#overview-of-a-task
-    # Tâches de prompt_generation définies dans config
+    # Méthodes tasks définies manuellement
     @task
     def draft_prompt(self) -> Task:
         cfg = self.tasks_config['draft_prompt']
-        agent_name = cfg.get('agent')
-        agent = self.agents_by_name.get(agent_name)
+        agent_inst = self.agents_by_name[cfg['agent']]
         return Task(
             description=cfg['description'],
-            agent=agent,
+            agent=agent_inst,
             tools=cfg.get('tools', []),
             **cfg.get('parameters', {})
         )
-
     @task
     def review_prompt(self) -> Task:
         cfg = self.tasks_config['review_prompt']
-        agent_name = cfg.get('agent')
-        agent = self.agents_by_name.get(agent_name)
+        agent_inst = self.agents_by_name[cfg['agent']]
         return Task(
             description=cfg['description'],
-            agent=agent,
+            agent=agent_inst,
             tools=cfg.get('tools', []),
             **cfg.get('parameters', {})
         )
-
     @task
     def finalize_prompt(self) -> Task:
         cfg = self.tasks_config['finalize_prompt']
-        agent_name = cfg.get('agent')
-        agent = self.agents_by_name.get(agent_name)
+        agent_inst = self.agents_by_name[cfg['agent']]
         return Task(
             description=cfg['description'],
-            agent=agent,
+            agent=agent_inst,
             tools=cfg.get('tools', []),
             **cfg.get('parameters', {})
         )
 
-    @crew
     def crew(self) -> Crew:
         """Creates the squadmanager crew"""
         crew_kwargs = {
@@ -249,3 +191,10 @@ class squadmanager():
                 em_conf = mc["entity_memory"].get("storage", {})
                 crew_kwargs["entity_memory"] = EntityMemory(storage=RAGStorage(**em_conf))
         return Crew(**crew_kwargs)
+
+    # Learn more about YAML configuration files here:
+    # Agents: https://docs.crewai.com/concepts/agents#yaml-configuration-recommended
+    # Tasks: https://docs.crewai.com/concepts/tasks#yaml-configuration-recommended
+    
+    # If you would like to add tools to your agents, you can learn more about it here:
+    # https://docs.crewai.com/concepts/agents#agent-tools
