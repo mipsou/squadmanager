@@ -30,7 +30,7 @@ build-backend = "hatchling.build"
 type = "crew"
 
 [project.optional-dependencies]
-tools = ["crewai[tools]>=0.11.2,<0.12.0"]
+tools = ["crewai[tools]>=0.11.2,<0.127.0"]
 
 [project.entry-points."squadmanager.plugins"]
 # Plugins can register under this group
